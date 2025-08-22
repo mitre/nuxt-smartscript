@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['../src/module'],
+  modules: ['../dist/module.mjs'],
   devtools: { enabled: true },
   smartscript: {
     // Module is enabled by default
