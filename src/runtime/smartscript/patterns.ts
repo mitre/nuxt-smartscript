@@ -4,25 +4,57 @@
 
 import type { PatternSet, SuperscriptConfig } from './types'
 
+// ============================================
+// Shared Regex Pattern Sources (DRY)
+// ============================================
+
+// Symbol patterns
+const TRADEMARK_PATTERN = /™|\(TM\)|\bTM\b/
+const REGISTERED_PATTERN = /®|\(R\)(?!\))/
+const COPYRIGHT_PATTERN = /©|\(C\)(?!\))/
+
+// Typography patterns
+const ORDINALS_PATTERN = /\b(\d+)(st|nd|rd|th)\b/
+const CHEMICALS_PATTERN = /([A-Z][a-z]?)(\d+)|\)(\d+)/
+
+// Math notation patterns (with lookbehind for context)
+const MATH_SUPER_PATTERN = /(?<=^|[\s=+\-*/().,\da-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/
+const MATH_SUB_PATTERN = /(?<=^|[\s=+\-*/().,])([a-z])_(\d+|[a-z]|\{[^}]+\})/i
+
+// Utility patterns for validation (used by PatternMatchers)
+const TRADEMARK_VALIDATE = /^(?:™|\(TM\)|TM)$/
+const REGISTERED_VALIDATE = /^(?:®|\(R\))$/
+const ORDINAL_VALIDATE = /^\d+(?:st|nd|rd|th)$/
+const CHEMICAL_ELEMENT_VALIDATE = /^[A-Z][a-z]?\d+$/
+const CHEMICAL_PARENS_VALIDATE = /^\)\d+$/
+const MATH_SUPER_VALIDATE = /^[a-z]\^/i
+const MATH_SUB_VALIDATE = /^[a-z]_/i
+
+// Extraction patterns (used by PatternExtractors)
+const ORDINAL_EXTRACT = /^(\d+)(st|nd|rd|th)$/
+const CHEMICAL_ELEMENT_EXTRACT = /^([A-Z][a-z]?)(\d+)$/
+const CHEMICAL_PARENS_EXTRACT = /^\)(\d+)$/
+const MATH_VARIABLE_EXTRACT = /^([a-z])[\^_](.+)$/i
+
 /**
  * Create regex patterns based on configuration
  */
 export function createPatterns(_config: SuperscriptConfig): PatternSet {
   return {
     // Matches ™, (TM), or standalone TM
-    trademark: /™|\(TM\)|\bTM\b/g,
+    trademark: new RegExp(TRADEMARK_PATTERN.source, 'g'),
 
     // Matches ®, (R) but not (R))
-    registered: /®|\(R\)(?!\))/g,
+    registered: new RegExp(REGISTERED_PATTERN.source, 'g'),
 
     // Matches ©, (C) but not (C))
-    copyright: /©|\(C\)(?!\))/g,
+    copyright: new RegExp(COPYRIGHT_PATTERN.source, 'g'),
 
     // Matches ordinal numbers (1st, 2nd, 3rd, 4th, etc.)
-    ordinals: /\b(\d+)(st|nd|rd|th)\b/g,
+    ordinals: new RegExp(ORDINALS_PATTERN.source, 'g'),
 
     // Matches chemical formulas: H2, SO4, )3
-    chemicals: /([A-Z][a-z]?)(\d+)|\)(\d+)/g,
+    chemicals: new RegExp(CHEMICALS_PATTERN.source, 'g'),
 
     // Matches math superscript notation: x^2, x^n, x^{expr}
     // Pattern: /(?<=^|[\s=+\-*/().,\d]|[a-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g
@@ -47,30 +79,12 @@ export function createPatterns(_config: SuperscriptConfig): PatternSet {
     // Examples that DON'T MATCH:
     // - "file^name" - 'e' is after 'l' but we still match (limitation)
     // - "MAX^2" - 'X' is after uppercase 'A' (blocked by lookbehind)
-    mathSuper: /(?<=^|[\s=+\-*/().,\da-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g,
+    mathSuper: new RegExp(MATH_SUPER_PATTERN.source, 'g'),
 
     // Matches math subscript notation: x_1, x_n, x_{expr}
-    // Pattern: /(?<=^|[\s=+\-*/().,])([a-zA-Z])_(\d+|[a-zA-Z]|\{[^}]+\})/g
-    //
-    // Breakdown:
-    // - (?<=...) - Positive lookbehind (more restrictive than superscript)
-    //   - ^|[\s=+\-*/().,] - ONLY after start, whitespace, or math operators
-    //   - NO [a-z] option (prevents matching in identifiers like file_name)
-    // - ([a-zA-Z]) - Capture group 1: single letter variable
-    // - _ - Literal underscore
-    // - (...) - Capture group 2: the subscript (same options as superscript)
-    //
-    // Examples that MATCH:
-    // - "x_1" → ["x_1"]
-    // - "H_2O" → ["H_2"] (after start)
-    // - "a=b_c" → ["b_c"] (after equals)
-    // - "(x_1)" → ["x_1"] (after parenthesis)
-    //
-    // Examples that DON'T MATCH:
-    // - "file_name" - 'e' is after letter 'l' (blocked by lookbehind)
-    // - "some_var" - 'e' is after letter 'm' (blocked by lookbehind)
-    // - "log_2" - 'g' is after letter 'o' (blocked by lookbehind)
-    mathSub: /(?<=^|[\s=+\-*/().,])([a-z])_(\d+|[a-z]|\{[^}]+\})/gi,
+    // Pattern uses lookbehind to prevent matching in identifiers
+    // Examples: "x_1" → match, "file_name" → no match
+    mathSub: new RegExp(MATH_SUB_PATTERN.source, 'gi'),
   }
 }
 
@@ -92,17 +106,25 @@ export function createCombinedPattern(patterns: PatternSet, config: SuperscriptC
 }
 
 /**
+ * Utility function to strip braces from math notation
+ */
+function stripBraces(text: string): string {
+  return text.replace(/[{}]/g, '')
+}
+
+/**
  * Pattern matching utilities
+ * Uses pre-compiled regex constants for better performance
  */
 export const PatternMatchers = {
-  isTrademark: (text: string): boolean => /^(?:™|\(TM\)|TM)$/.test(text),
-  isRegistered: (text: string): boolean => /^(?:®|\(R\))$/.test(text),
-  isCopyright: (text: string): boolean => /©|\(C\)/.test(text),
-  isOrdinal: (text: string): boolean => /^\d+(?:st|nd|rd|th)$/.test(text),
-  isChemicalElement: (text: string): boolean => /^[A-Z][a-z]?\d+$/.test(text),
-  isChemicalParentheses: (text: string): boolean => /^\)\d+$/.test(text),
-  isMathSuperscript: (text: string): boolean => /^[a-z]\^/i.test(text),
-  isMathSubscript: (text: string): boolean => /^[a-z]_/i.test(text),
+  isTrademark: (text: string): boolean => TRADEMARK_VALIDATE.test(text),
+  isRegistered: (text: string): boolean => REGISTERED_VALIDATE.test(text),
+  isCopyright: (text: string): boolean => COPYRIGHT_PATTERN.test(text),
+  isOrdinal: (text: string): boolean => ORDINAL_VALIDATE.test(text),
+  isChemicalElement: (text: string): boolean => CHEMICAL_ELEMENT_VALIDATE.test(text),
+  isChemicalParentheses: (text: string): boolean => CHEMICAL_PARENS_VALIDATE.test(text),
+  isMathSuperscript: (text: string): boolean => MATH_SUPER_VALIDATE.test(text),
+  isMathSubscript: (text: string): boolean => MATH_SUB_VALIDATE.test(text),
 }
 
 /**
@@ -110,42 +132,33 @@ export const PatternMatchers = {
  */
 export const PatternExtractors = {
   extractOrdinal: (text: string): { number: string, suffix: string } | null => {
-    const match = text.match(/^(\d+)(st|nd|rd|th)$/)
+    const match = text.match(ORDINAL_EXTRACT)
     return match ? { number: match[1], suffix: match[2] } : null
   },
 
   extractChemicalElement: (text: string): { element: string, count: string } | null => {
-    const match = text.match(/^([A-Z][a-z]?)(\d+)$/)
+    const match = text.match(CHEMICAL_ELEMENT_EXTRACT)
     return match ? { element: match[1], count: match[2] } : null
   },
 
   extractChemicalParentheses: (text: string): string | null => {
-    const match = text.match(/^\)(\d+)$/)
+    const match = text.match(CHEMICAL_PARENS_EXTRACT)
     return match ? match[1] : null
   },
 
   extractMathScript: (text: string): string => {
-    return text.substring(1).replace(/[{}]/g, '')
+    return stripBraces(text.substring(1))
   },
 
   extractMathWithVariable: (text: string): { variable: string, script: string } | null => {
-    // Handle x^2, x_n, x^{10}, x_{n+1} etc.
-    const superMatch = text.match(/^([a-z])\^(.+)$/i)
-    if (superMatch) {
+    // Unified pattern for both super (^) and subscript (_)
+    const match = text.match(MATH_VARIABLE_EXTRACT)
+    if (match) {
       return {
-        variable: superMatch[1],
-        script: superMatch[2].replace(/[{}]/g, ''),
+        variable: match[1],
+        script: stripBraces(match[2]),
       }
     }
-
-    const subMatch = text.match(/^([a-z])_(.+)$/i)
-    if (subMatch) {
-      return {
-        variable: subMatch[1],
-        script: subMatch[2].replace(/[{}]/g, ''),
-      }
-    }
-
     return null
   },
 }

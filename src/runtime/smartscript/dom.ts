@@ -5,6 +5,10 @@
 import type { TextPart } from './types'
 import { logger } from './logger'
 
+// Pre-compiled regex patterns for performance
+const DIGITS_ONLY = /^\d+$/
+const ORDINAL_SUFFIX = /^(?:st|nd|rd|th)$/
+
 /**
  * Create a superscript element with appropriate attributes
  */
@@ -54,7 +58,7 @@ export function createSubscriptElement(
   switch (type) {
     case 'chemical':
       // For chemical formulas, just the number is clearer
-      if (/^\d+$/.test(content)) {
+      if (DIGITS_ONLY.test(content)) {
         sub.setAttribute('aria-label', content)
       }
       else {
@@ -89,7 +93,7 @@ export function createFragmentFromParts(parts: TextPart[]): DocumentFragment {
       else if (part.content === '®') {
         element = createSuperscriptElement(part.content, 'registered')
       }
-      else if (/^(?:st|nd|rd|th)$/.test(part.content)) {
+      else if (ORDINAL_SUFFIX.test(part.content)) {
         element = createSuperscriptElement(part.content, 'ordinal')
       }
       else {
@@ -99,7 +103,7 @@ export function createFragmentFromParts(parts: TextPart[]): DocumentFragment {
       fragment.appendChild(element)
     }
     else if (part.type === 'sub') {
-      const isChemical = /^\d+$/.test(part.content)
+      const isChemical = DIGITS_ONLY.test(part.content)
       const element = createSubscriptElement(
         part.content,
         isChemical ? 'chemical' : 'generic',
