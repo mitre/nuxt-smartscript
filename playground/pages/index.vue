@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <h1>Nuxt SmartScript™ Demo</h1>
+    <h1>H1: Nuxt SmartScript™ Demo - MITRE(TM)</h1>
+    <h2>H2: MITRE(TM) Test</h2>
+    <h3>H3: MITRE(TM) Test</h3>
+    <h4>H4: MITRE(TM) Test</h4>
+    <h5>H5: MITRE(TM) Test</h5>
+    <h6>H6: MITRE(TM) Test</h6>
 
     <section>
       <h2>Debug Info</h2>
@@ -18,6 +23,30 @@
       <div v-if="stats">
         <p>Processed elements: {{ stats.processedElements }}</p>
         <p>Superscripts: {{ stats.superscripts }}, Subscripts: {{ stats.subscripts }}</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Font Testing</h2>
+      <div style="font-family: Arial, sans-serif;">
+        <h3>Arial: MITRE(TM) ACT(TM)</h3>
+        <p>Body text: MITRE(TM) and ACT(TM) testing</p>
+      </div>
+      <div style="font-family: 'Times New Roman', serif;">
+        <h3>Times New Roman: MITRE(TM) ACT(TM)</h3>
+        <p>Body text: MITRE(TM) and ACT(TM) testing</p>
+      </div>
+      <div style="font-family: Georgia, serif;">
+        <h3>Georgia: MITRE(TM) ACT(TM)</h3>
+        <p>Body text: MITRE(TM) and ACT(TM) testing</p>
+      </div>
+      <div style="font-family: 'Courier New', monospace;">
+        <h3>Courier New: MITRE(TM) ACT(TM)</h3>
+        <p>Body text: MITRE(TM) and ACT(TM) testing</p>
+      </div>
+      <div style="font-family: system-ui, -apple-system, sans-serif;">
+        <h3>System UI: MITRE(TM) ACT(TM)</h3>
+        <p>Body text: MITRE(TM) and ACT(TM) testing</p>
       </div>
     </section>
 
