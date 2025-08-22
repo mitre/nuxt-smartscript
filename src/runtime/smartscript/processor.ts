@@ -12,13 +12,13 @@ import { logger } from './logger'
 export function processMatch(matched: string): ProcessingResult {
   logger.debug('processMatch called with:', matched)
 
-  // Trademark symbols - Unicode character already positioned
+  // Trademark symbols - wrap in superscript for proper positioning
   if (PatternMatchers.isTrademark(matched)) {
     logger.debug('Trademark match confirmed for:', matched)
     return {
       modified: true,
       parts: [{
-        type: 'text',
+        type: 'super',
         content: '™',
       }],
     }
