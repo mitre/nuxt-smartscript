@@ -5,6 +5,53 @@ All notable changes to nuxt-smartscript will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.1.1
+
+
+### 🚀 Enhancements
+
+- Implement core SmartScript typography transformation engine ([9b30d6c](https://github.com/mitre/nuxt-smartscript/commit/9b30d6c))
+- Add interactive playground demo ([1da020e](https://github.com/mitre/nuxt-smartscript/commit/1da020e))
+
+### 🩹 Fixes
+
+- Resolve all ESLint errors and warnings ([41b41de](https://github.com/mitre/nuxt-smartscript/commit/41b41de))
+
+### 💅 Refactors
+
+- Simplify release process to use changelogen ([3002b6e](https://github.com/mitre/nuxt-smartscript/commit/3002b6e))
+
+### 📖 Documentation
+
+- Add comprehensive documentation and changelog ([2c22c61](https://github.com/mitre/nuxt-smartscript/commit/2c22c61))
+- Add CLAUDE.md for AI assistant context ([09318c9](https://github.com/mitre/nuxt-smartscript/commit/09318c9))
+
+### 📦 Build
+
+- Add build configuration and dependencies ([878aa6b](https://github.com/mitre/nuxt-smartscript/commit/878aa6b))
+
+### 🏡 Chore
+
+- Initial project setup ([af3556d](https://github.com/mitre/nuxt-smartscript/commit/af3556d))
+- Standardize on Node.js 22 LTS and fix docs ([3e88d5e](https://github.com/mitre/nuxt-smartscript/commit/3e88d5e))
+
+### ✅ Tests
+
+- Add comprehensive test suite ([f00a86a](https://github.com/mitre/nuxt-smartscript/commit/f00a86a))
+
+### 🎨 Styles
+
+- Apply ESLint formatting fixes ([fb0f830](https://github.com/mitre/nuxt-smartscript/commit/fb0f830))
+
+### 🤖 CI
+
+- Add GitHub workflows and community standards ([fa015ec](https://github.com/mitre/nuxt-smartscript/commit/fa015ec))
+- Add comprehensive release workflow and documentation ([6fa62d9](https://github.com/mitre/nuxt-smartscript/commit/6fa62d9))
+
+### ❤️ Contributors
+
+- Aaron Lippold ([@aaronlippold](https://github.com/aaronlippold))
+
 ## [Unreleased]
 
 ## [0.1.0] - 2024-08-22
