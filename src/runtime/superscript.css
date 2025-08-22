@@ -1,120 +1,105 @@
 /* Superscript and Subscript Typography Enhancement Styles */
-/* Pure CSS - Framework agnostic */
+/* SmartScript (ss-) prefixed classes for automatic typography */
 
-/* Auto-generated superscript elements */
-sup.auto-super,
-.text-super {
-  /* Spacing for better readability */
-  margin-left: 0.05em;   /* Small space before */
-  margin-right: 0.1em;   /* Slightly more space after */
-  
-  /* Core superscript styling */
+/* ============================================
+   Core Superscript Styling
+   Best practice: Use vertical-align: super with line-height: 0
+   ============================================ */
+sup.ss-sup {
+  /* Size reduction */
   font-size: 0.75em;
-  line-height: 0;
-  vertical-align: super;  /* Use browser's native superscript positioning - adapts to font metrics */
   
-  /* Visual refinement */
+  /* Use browser's native superscript positioning */
+  vertical-align: super;
+  
+  /* Prevent line-height disruption */
+  line-height: 0;
+  
+  /* Fine-tune position - bring down slightly from browser default */
+  position: relative;
+  top: 0.15em;  /* Scales with font size */
+  
+  /* Spacing */
+  margin-left: 0.05em;
+  margin-right: 0.1em;
+  
+  /* Inherit parent styles */
   font-weight: inherit;
   letter-spacing: 0.025em;
 }
 
-/* Auto-generated subscript elements */  
-sub.auto-sub,
-.text-sub {
-  /* Spacing for better readability */
-  margin-left: 0.05em;   /* Small space before */
-  margin-right: 0.1em;   /* Slightly more space after */
-  
-  /* Core subscript styling */
+/* ============================================
+   Core Subscript Styling
+   ============================================ */
+sub.ss-sub {
+  /* Size reduction */
   font-size: 0.75em;
-  line-height: 0;
-  vertical-align: sub;    /* Use browser's native subscript positioning */
   
-  /* Visual refinement */
+  /* Use browser's native subscript positioning */
+  vertical-align: sub;
+  
+  /* Prevent line-height disruption */
+  line-height: 0;
+  
+  /* Spacing */
+  margin-left: 0.05em;
+  margin-right: 0.1em;
+  
+  /* Inherit parent styles */
   font-weight: inherit;
   letter-spacing: 0.025em;
 }
 
-/* Special handling for consecutive super/subscripts */
-sup.auto-super + sup.auto-super,
-sub.auto-sub + sub.auto-sub {
-  margin-left: 0;  /* No extra space between consecutive elements */
-}
-
-/* In headings, adjust sizing */
-h1 sup.auto-super, h1 sub.auto-sub,
-h2 sup.auto-super, h2 sub.auto-sub,
-h3 sup.auto-super, h3 sub.auto-sub {
-  font-size: 0.65em;  /* Slightly smaller in headings */
-}
-
-/* Special handling for Unicode trademark and registered symbols */
-/* These already have some superscript positioning built into the character */
-/* So we need less vertical adjustment */
-sup.trademark-symbol {
-  font-size: 0.8em;  /* Slightly larger since the Unicode character is already small */
-  vertical-align: baseline;
-  position: relative;
-  top: -0.3em;  /* Reduced from -0.5em to better match registered symbol */
-  margin-left: 0.05em;
-  margin-right: 0.05em;
-}
-
-/* Registered symbol needs different positioning due to the circle */
-sup.registered-symbol {
-  font-size: 0.8em;
-  vertical-align: baseline;
-  position: relative;
-  top: -0.25em;  /* Lower than TM to account for circle - adjusted for better alignment */
-  margin-left: 0.05em;
-  margin-right: 0.05em;
-}
-
-/* In headings, raise trademark and registered symbols higher */
-h1 sup.trademark-symbol, 
-h2 sup.trademark-symbol, 
-h3 sup.trademark-symbol,
-h4 sup.trademark-symbol,
-h5 sup.trademark-symbol,
-h6 sup.trademark-symbol {
-  top: -0.5em;  /* Reduced from -0.7em for better balance */
+/* ============================================
+   Headings: Slightly smaller for visual balance
+   ============================================ */
+:is(h1, h2, h3, h4, h5, h6) sup.ss-sup,
+:is(h1, h2, h3, h4, h5, h6) sub.ss-sub {
   font-size: 0.65em;
 }
 
-/* Registered in headings - slightly lower than TM */
-h1 sup.registered-symbol,
-h2 sup.registered-symbol,
-h3 sup.registered-symbol,
-h4 sup.registered-symbol,
-h5 sup.registered-symbol,
-h6 sup.registered-symbol {
-  top: -0.4em;  /* Slightly lower than TM to account for circle */
-  font-size: 0.65em;
+/* ============================================
+   Special Cases
+   ============================================ */
+
+/* Remove spacing between consecutive super/subscripts */
+:is(sup.ss-sup, sub.ss-sub) + :is(sup.ss-sup, sub.ss-sub) {
+  margin-left: 0;
 }
 
-/* Specific adjustments for chemical formulas */
-/* Removed first-child rule as it was incorrectly removing margins */
+/* Specific symbol classes for semantic clarity */
+sup.ss-tm {
+  /* Inherits from ss-sup */
+}
 
-/* Print styles */
+sup.ss-reg {
+  /* Inherits from ss-sup */
+}
+
+/* ============================================
+   Media Queries & Accessibility
+   ============================================ */
+
+/* Print optimization */
 @media print {
-  sup.auto-super,
-  sub.auto-sub {
-    font-size: 0.7em;  /* Slightly smaller for print */
+  sup.ss-sup, 
+  sub.ss-sub {
+    font-size: 0.7em;
   }
 }
 
-/* High contrast mode support */
+/* High contrast mode */
 @media (prefers-contrast: high) {
-  sup.auto-super,
-  sub.auto-sub {
-    font-weight: bold;  /* Make more visible in high contrast */
+  sup.ss-sup, 
+  sub.ss-sub {
+    font-weight: bold;
   }
 }
 
-/* Reduce motion support */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  sup.auto-super,
-  sub.auto-sub {
-    transition: none;  /* Remove any transitions */
+  sup.ss-sup, 
+  sub.ss-sub {
+    transition: none;
   }
 }

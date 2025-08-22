@@ -17,23 +17,23 @@ export function createSuperscriptElement(
 
   switch (type) {
     case 'trademark':
-      sup.className = 'auto-super trademark-symbol'
+      sup.className = 'ss-sup ss-tm'
       sup.setAttribute('aria-label', 'trademark')
       break
     case 'registered':
-      sup.className = 'auto-super registered-symbol'
+      sup.className = 'ss-sup ss-reg'
       sup.setAttribute('aria-label', 'registered')
       break
     case 'ordinal':
-      sup.className = 'auto-super ordinal-suffix'
+      sup.className = 'ss-sup ss-ordinal'
       sup.setAttribute('aria-label', content)
       break
     case 'math':
-      sup.className = 'auto-super math-notation'
+      sup.className = 'ss-sup ss-math'
       sup.setAttribute('aria-label', `superscript ${content}`)
       break
     default:
-      sup.className = 'auto-super'
+      sup.className = 'ss-sup'
       sup.setAttribute('aria-label', `superscript ${content}`)
   }
 
@@ -49,7 +49,7 @@ export function createSubscriptElement(
 ): HTMLElement {
   const sub = document.createElement('sub')
   sub.textContent = content
-  sub.className = 'auto-sub'
+  sub.className = 'ss-sub'
 
   switch (type) {
     case 'chemical':
