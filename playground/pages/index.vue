@@ -6,9 +6,15 @@
       <h2>Debug Info</h2>
       <p>Plugin status: {{ $smartscript ? 'Loaded' : 'Not loaded' }}</p>
       <p>Debug mode: {{ debugMode ? 'ON' : 'OFF' }}</p>
-      <button @click="toggleDebug">Toggle Debug Mode</button>
-      <button @click="manualProcess">Manual Process</button>
-      <button @click="getStats">Get Stats</button>
+      <button @click="toggleDebug">
+        Toggle Debug Mode
+      </button>
+      <button @click="manualProcess">
+        Manual Process
+      </button>
+      <button @click="getStats">
+        Get Stats
+      </button>
       <div v-if="stats">
         <p>Processed elements: {{ stats.processedElements }}</p>
         <p>Superscripts: {{ stats.superscripts }}, Subscripts: {{ stats.subscripts }}</p>
@@ -71,16 +77,16 @@
       <h3>Code Blocks (Not Transformed)</h3>
       <pre>Code blocks should not transform: H2O, 1st, Product™, x^2</pre>
       <code>Inline code: H2O, CO2, 1st, E=mc^2</code>
-      
+
       <h3>Explicit Exclusion</h3>
       <div data-no-superscript>
         <p>This section excluded: H2O, CO2, 1st, Product™, x^2</p>
       </div>
-      
+
       <h3>Programming Identifiers (Correctly Not Transformed)</h3>
       <p>Variables: file_name, some_var, MAX_SIZE stay unchanged</p>
       <p>But math after equals works: var=x^2 transforms x^2</p>
-      
+
       <h3>Edge Cases That Work</h3>
       <p>After lowercase: abc^2 transforms c^2 (like E=mc^2)</p>
       <p>After uppercase: ABC^2 doesn't transform (intentional)</p>
@@ -106,7 +112,7 @@ const toggleDebug = () => {
     debugMode.value = !debugMode.value
     const config = $smartscript.getConfig()
     $smartscript.updateConfig({ ...config, debug: debugMode.value })
-    console.log('Debug mode:', debugMode.value ? 'enabled' : 'disabled')
+    // Debug mode toggle handled by updateConfig
   }
 }
 

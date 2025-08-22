@@ -15,13 +15,13 @@ describe('Edge Cases and Corner Cases', () => {
   describe('Boundary Cases', () => {
     describe('Ordinal Edge Cases', () => {
       it('should handle large ordinal numbers', () => {
-        const pattern = /\b(\d+)(st|nd|rd|th)\b/g
+        const pattern = /\b\d+(?:st|nd|rd|th)\b/g
         expect('999999th'.match(pattern)).toEqual(['999999th'])
         expect('1000000th'.match(pattern)).toEqual(['1000000th'])
       })
 
       it('should handle special ordinal cases', () => {
-        const pattern = /\b(\d+)(st|nd|rd|th)\b/g
+        const pattern = /\b\d+(?:st|nd|rd|th)\b/g
         // 11th, 12th, 13th are special cases (not 11st, 12nd, 13rd)
         expect('11th'.match(pattern)).toEqual(['11th'])
         expect('12th'.match(pattern)).toEqual(['12th'])
@@ -32,14 +32,14 @@ describe('Edge Cases and Corner Cases', () => {
       })
 
       it('should not match ordinals in the middle of words', () => {
-        const pattern = /\b(\d+)(st|nd|rd|th)\b/g
+        const pattern = /\b\d+(?:st|nd|rd|th)\b/g
         expect('test1st'.match(pattern)).toBeNull()
         expect('1sttest'.match(pattern)).toBeNull()
         expect('the1st'.match(pattern)).toBeNull()
       })
 
       it('should handle ordinals at sentence boundaries', () => {
-        const pattern = /\b(\d+)(st|nd|rd|th)\b/g
+        const pattern = /\b\d+(?:st|nd|rd|th)\b/g
         expect('1st.'.match(pattern)).toEqual(['1st'])
         expect('2nd,'.match(pattern)).toEqual(['2nd'])
         expect('3rd!'.match(pattern)).toEqual(['3rd'])
@@ -83,34 +83,34 @@ describe('Edge Cases and Corner Cases', () => {
 
     describe('Chemical Formula Edge Cases', () => {
       it('should handle single letter elements', () => {
-        const pattern = /([A-Z][a-z]?)(\d+)/g
+        const pattern = /[A-Z][a-z]?\d+/g
         expect('H2'.match(pattern)).toEqual(['H2'])
         expect('O2'.match(pattern)).toEqual(['O2'])
         expect('N2'.match(pattern)).toEqual(['N2'])
       })
 
       it('should handle two letter elements', () => {
-        const pattern = /([A-Z][a-z]?)(\d+)/g
+        const pattern = /[A-Z][a-z]?\d+/g
         expect('Ca2'.match(pattern)).toEqual(['Ca2'])
         expect('Mg3'.match(pattern)).toEqual(['Mg3'])
         expect('Na4'.match(pattern)).toEqual(['Na4'])
       })
 
       it('should handle large molecule counts', () => {
-        const pattern = /([A-Z][a-z]?)(\d+)/g
+        const pattern = /[A-Z][a-z]?\d+/g
         expect('H100'.match(pattern)).toEqual(['H100'])
         expect('O999'.match(pattern)).toEqual(['O999'])
       })
 
       it('should handle complex parentheses formulas', () => {
-        const pattern = /\)(\d+)/g
+        const pattern = /\)\d+/g
         expect('Ca(OH)2'.match(pattern)).toEqual([')2'])
         expect('Al2(SO4)3'.match(pattern)).toEqual([')3'])
         expect('Mg3(PO4)2'.match(pattern)).toEqual([')2'])
       })
 
       it('should not match invalid chemical patterns', () => {
-        const pattern = /([A-Z][a-z]?)(\d+)/g
+        const pattern = /[A-Z][a-z]?\d+/g
         expect('lowercase2'.match(pattern)).toBeNull()
         // ABC2 would match C2 since C is a valid element
         // Use a better example with invalid element pattern
@@ -121,7 +121,7 @@ describe('Edge Cases and Corner Cases', () => {
 
     describe('Math Notation Edge Cases', () => {
       it('should handle various superscript patterns', () => {
-        const pattern = /(?<![a-zA-Z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g
+        const pattern = /(?<![a-z])[a-z]\^(?:\d+|[a-z]|\{[^}]+\})/gi
         expect('x^2'.match(pattern)).toEqual(['x^2'])
         expect('x^n'.match(pattern)).toEqual(['x^n'])
         expect('x^{10}'.match(pattern)).toEqual(['x^{10}'])
@@ -130,7 +130,7 @@ describe('Edge Cases and Corner Cases', () => {
       })
 
       it('should handle various subscript patterns', () => {
-        const pattern = /(?<![a-zA-Z])([a-zA-Z])_(\d+|[a-zA-Z]|\{[^}]+\})/g
+        const pattern = /(?<![a-z])[a-z]_(?:\d+|[a-z]|\{[^}]+\})/gi
         expect('x_1'.match(pattern)).toEqual(['x_1'])
         expect('x_n'.match(pattern)).toEqual(['x_n'])
         expect('x_{10}'.match(pattern)).toEqual(['x_{10}'])
@@ -139,12 +139,12 @@ describe('Edge Cases and Corner Cases', () => {
       })
 
       it('should handle nested braces in math', () => {
-        const pattern = /(?<![a-zA-Z])([a-zA-Z])\^(\{[^}]+\})/g
+        const pattern = /(?<![a-z])[a-z]\^\{[^}]+\}/gi
         expect('x^{a^2}'.match(pattern)).toEqual(['x^{a^2}'])
       })
 
       it('should not match incomplete patterns', () => {
-        const pattern = /\^(\d+|\{[^}]+\})/g
+        const pattern = /\^(?:\d+|\{[^}]+\})/g
         expect('x^'.match(pattern)).toBeNull()
         expect('x^{'.match(pattern)).toBeNull()
         expect('x^{unclosed'.match(pattern)).toBeNull()
@@ -212,7 +212,7 @@ describe('Edge Cases and Corner Cases', () => {
       const ordPattern = /\b(\d+)(st|nd|rd|th)\b/g
       const chemPattern = /([A-Z][a-z]?)(\d+)/g
       const mathPattern = /\^(\d+)/g
-      
+
       expect(text.match(tmPattern)).toEqual(['(TM)'])
       expect(text.match(ordPattern)).toEqual(['1st'])
       expect(text.match(chemPattern)).toEqual(['H2'])
@@ -223,10 +223,10 @@ describe('Edge Cases and Corner Cases', () => {
       // R could be element or registered mark
       const rPattern = /\(R\)/g
       const chemPattern = /\bR\d+/g
-      
+
       const text1 = 'Brand(R) formula'
       const text2 = 'R2 resistance'
-      
+
       expect(text1.match(rPattern)).toEqual(['(R)'])
       expect(text2.match(chemPattern)).toEqual(['R2'])
     })
@@ -250,8 +250,8 @@ describe('Edge Cases and Corner Cases', () => {
         document.createElement('li'),
         document.createElement('td'),
       ]
-      
-      contexts.forEach(element => {
+
+      contexts.forEach((element) => {
         element.textContent = 'Product(TM)'
         expect(element.textContent).toBe('Product(TM)')
       })
@@ -276,24 +276,24 @@ describe('Edge Cases and Corner Cases', () => {
     it('should handle regex with global flag correctly', () => {
       const pattern = /\(TM\)/g
       const text = 'Product(TM) Another(TM)'
-      
+
       // First execution
-      let match1 = pattern.exec(text)
+      const match1 = pattern.exec(text)
       expect(match1?.[0]).toBe('(TM)')
       expect(pattern.lastIndex).toBe(11)
-      
+
       // Second execution continues from lastIndex
-      let match2 = pattern.exec(text)
+      const match2 = pattern.exec(text)
       expect(match2?.[0]).toBe('(TM)')
       expect(pattern.lastIndex).toBe(23)
-      
+
       // Third execution returns null and resets
-      let match3 = pattern.exec(text)
+      const match3 = pattern.exec(text)
       expect(match3).toBeNull()
       expect(pattern.lastIndex).toBe(0)
-      
+
       // Fourth execution starts over
-      let match4 = pattern.exec(text)
+      const match4 = pattern.exec(text)
       expect(match4?.[0]).toBe('(TM)')
     })
 
@@ -301,11 +301,11 @@ describe('Edge Cases and Corner Cases', () => {
       const pattern = /\(TM\)/g
       const text1 = 'Product(TM)'
       const text2 = 'Another(TM)'
-      
+
       // Test on first string
       pattern.lastIndex = 0
       expect(pattern.test(text1)).toBe(true)
-      
+
       // Reset before testing second string
       pattern.lastIndex = 0
       expect(pattern.test(text2)).toBe(true)
@@ -345,8 +345,8 @@ describe('Edge Cases and Corner Cases', () => {
         'Продукт(TM) русский',
         '产品(TM)中文',
       ]
-      
-      texts.forEach(text => {
+
+      texts.forEach((text) => {
         expect(text.match(pattern)).toEqual(['(TM)'])
       })
     })
@@ -364,12 +364,12 @@ describe('Edge Cases and Corner Cases', () => {
       const longInput = 'TM'.repeat(1000)
       const result1 = processMatch(longInput)
       expect(result1.modified).toBeDefined()
-      
+
       // Unicode input
       const unicodeResult = processMatch('™')
       expect(unicodeResult.modified).toBe(true)
       expect(unicodeResult.parts[0].content).toBe('™')
-      
+
       // Mixed case that shouldn't match
       const noMatch = processMatch('random text')
       expect(noMatch.modified).toBe(false)
@@ -377,7 +377,7 @@ describe('Edge Cases and Corner Cases', () => {
 
     it('should handle special ordinal processing', () => {
       const ordinals = ['1st', '2nd', '3rd', '21st', '22nd', '23rd', '31st', '101st']
-      ordinals.forEach(ord => {
+      ordinals.forEach((ord) => {
         const result = processMatch(ord)
         expect(result.modified).toBe(true)
         expect(result.parts).toHaveLength(2) // number + suffix

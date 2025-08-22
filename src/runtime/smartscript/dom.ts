@@ -2,7 +2,7 @@
  * DOM manipulation utilities for SmartScript
  */
 
-import type { TextPart, SuperscriptConfig } from './types'
+import type { TextPart } from './types'
 import { logger } from './logger'
 
 /**
@@ -89,7 +89,7 @@ export function createFragmentFromParts(parts: TextPart[]): DocumentFragment {
       else if (part.content === '®') {
         element = createSuperscriptElement(part.content, 'registered')
       }
-      else if (/^(st|nd|rd|th)$/.test(part.content)) {
+      else if (/^(?:st|nd|rd|th)$/.test(part.content)) {
         element = createSuperscriptElement(part.content, 'ordinal')
       }
       else {

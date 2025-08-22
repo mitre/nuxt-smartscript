@@ -72,14 +72,14 @@ describe('SmartScript Typography Patterns', () => {
 
     describe('Chemical Formulas', () => {
       it('should match simple chemical formulas', () => {
-        const pattern = /([A-Z][a-z]?)(\d+)/g
+        const pattern = /[A-Z][a-z]?\d+/g
         expect('H2O'.match(pattern)).toEqual(['H2'])
         expect('CO2'.match(pattern)).toEqual(['O2']) // C doesn't have a number, only O2
         expect('H2SO4'.match(pattern)).toEqual(['H2', 'O4']) // Matches H2 and O4 separately
       })
 
       it('should match complex formulas with parentheses', () => {
-        const pattern = /\([A-Z][a-z]?[A-Z]?\d*\)(\d+)/g
+        const pattern = /\([A-Z][a-z]?[A-Z]?\d*\)\d+/g
         expect('Al2(SO4)3'.match(pattern)).toEqual(['(SO4)3'])
         expect('Ca(OH)2'.match(pattern)).toEqual(['(OH)2'])
       })
@@ -87,7 +87,7 @@ describe('SmartScript Typography Patterns', () => {
 
     describe('Mathematical Notation', () => {
       it('should match superscript notation', () => {
-        const pattern = /(?<=^|[\s=+\-*/().,\d]|[a-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g
+        const pattern = /(?<=^|[\s=+\-*/().,\da-z])[a-zA-Z]\^(?:\d+|[a-zA-Z]|\{[^}]+\})/g
         expect('x^2'.match(pattern)).toEqual(['x^2'])
         expect('E=mc^2'.match(pattern)).toEqual(['c^2'])
         expect('x^n'.match(pattern)).toEqual(['x^n'])
@@ -97,7 +97,7 @@ describe('SmartScript Typography Patterns', () => {
       })
 
       it('should match subscript notation', () => {
-        const pattern = /(?<=^|[\s=+\-*/().,])([a-zA-Z])_(\d+|[a-zA-Z]|\{[^}]+\})/g
+        const pattern = /(?<=^|[\s=+\-*/().,])[a-z]_(?:\d+|[a-z]|\{[^}]+\})/gi
         expect('x_1'.match(pattern)).toEqual(['x_1'])
         expect('x_n'.match(pattern)).toEqual(['x_n'])
         expect('y_i'.match(pattern)).toEqual(['y_i'])

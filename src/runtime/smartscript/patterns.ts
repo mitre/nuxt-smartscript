@@ -7,7 +7,7 @@ import type { PatternSet, SuperscriptConfig } from './types'
 /**
  * Create regex patterns based on configuration
  */
-export function createPatterns(config: SuperscriptConfig): PatternSet {
+export function createPatterns(_config: SuperscriptConfig): PatternSet {
   return {
     // Matches ™, (TM), or standalone TM
     trademark: /™|\(TM\)|\bTM\b/g,
@@ -26,7 +26,7 @@ export function createPatterns(config: SuperscriptConfig): PatternSet {
 
     // Matches math superscript notation: x^2, x^n, x^{expr}
     // Pattern: /(?<=^|[\s=+\-*/().,\d]|[a-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g
-    // 
+    //
     // Breakdown:
     // - (?<=...) - Positive lookbehind to ensure proper context
     //   - ^|[\s=+\-*/().,\d] - After start of string, whitespace, operators, or digits
@@ -47,7 +47,7 @@ export function createPatterns(config: SuperscriptConfig): PatternSet {
     // Examples that DON'T MATCH:
     // - "file^name" - 'e' is after 'l' but we still match (limitation)
     // - "MAX^2" - 'X' is after uppercase 'A' (blocked by lookbehind)
-    mathSuper: /(?<=^|[\s=+\-*/().,\d]|[a-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g,
+    mathSuper: /(?<=^|[\s=+\-*/().,\da-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g,
 
     // Matches math subscript notation: x_1, x_n, x_{expr}
     // Pattern: /(?<=^|[\s=+\-*/().,])([a-zA-Z])_(\d+|[a-zA-Z]|\{[^}]+\})/g
@@ -70,7 +70,7 @@ export function createPatterns(config: SuperscriptConfig): PatternSet {
     // - "file_name" - 'e' is after letter 'l' (blocked by lookbehind)
     // - "some_var" - 'e' is after letter 'm' (blocked by lookbehind)
     // - "log_2" - 'g' is after letter 'o' (blocked by lookbehind)
-    mathSub: /(?<=^|[\s=+\-*/().,])([a-zA-Z])_(\d+|[a-zA-Z]|\{[^}]+\})/g,
+    mathSub: /(?<=^|[\s=+\-*/().,])([a-z])_(\d+|[a-z]|\{[^}]+\})/gi,
   }
 }
 
@@ -97,12 +97,12 @@ export function createCombinedPattern(patterns: PatternSet, config: SuperscriptC
 export const PatternMatchers = {
   isTrademark: (text: string): boolean => /^(?:™|\(TM\)|TM)$/.test(text),
   isRegistered: (text: string): boolean => /^(?:®|\(R\))$/.test(text),
-  isCopyright: (text: string): boolean => /(?:©|\(C\))/.test(text),
+  isCopyright: (text: string): boolean => /©|\(C\)/.test(text),
   isOrdinal: (text: string): boolean => /^\d+(?:st|nd|rd|th)$/.test(text),
   isChemicalElement: (text: string): boolean => /^[A-Z][a-z]?\d+$/.test(text),
   isChemicalParentheses: (text: string): boolean => /^\)\d+$/.test(text),
-  isMathSuperscript: (text: string): boolean => /^[a-zA-Z]\^/.test(text),
-  isMathSubscript: (text: string): boolean => /^[a-zA-Z]_/.test(text),
+  isMathSuperscript: (text: string): boolean => /^[a-z]\^/i.test(text),
+  isMathSubscript: (text: string): boolean => /^[a-z]_/i.test(text),
 }
 
 /**
@@ -128,24 +128,24 @@ export const PatternExtractors = {
     return text.substring(1).replace(/[{}]/g, '')
   },
 
-  extractMathWithVariable: (text: string): { variable: string; script: string } | null => {
+  extractMathWithVariable: (text: string): { variable: string, script: string } | null => {
     // Handle x^2, x_n, x^{10}, x_{n+1} etc.
-    const superMatch = text.match(/^([a-zA-Z])\^(.+)$/)
+    const superMatch = text.match(/^([a-z])\^(.+)$/i)
     if (superMatch) {
       return {
         variable: superMatch[1],
         script: superMatch[2].replace(/[{}]/g, ''),
       }
     }
-    
-    const subMatch = text.match(/^([a-zA-Z])_(.+)$/)
+
+    const subMatch = text.match(/^([a-z])_(.+)$/i)
     if (subMatch) {
       return {
         variable: subMatch[1],
         script: subMatch[2].replace(/[{}]/g, ''),
       }
     }
-    
+
     return null
   },
 }

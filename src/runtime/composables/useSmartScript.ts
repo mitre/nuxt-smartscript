@@ -2,15 +2,16 @@
  * Vue composable for SmartScript
  */
 
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useNuxtApp } from '#app'
+import type { SuperscriptConfig } from '../smartscript/types'
 
 export interface SmartScriptApi {
   process: () => void
   startObserving: () => void
   stopObserving: () => void
-  getConfig: () => any
-  updateConfig: (config: any) => boolean
+  getConfig: () => SuperscriptConfig
+  updateConfig: (config: Partial<SuperscriptConfig>) => boolean
   reset: () => void
   getStats: () => {
     processedElements: number

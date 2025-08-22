@@ -21,7 +21,7 @@ describe('Integration Tests', () => {
       const text = 'Welcome to Product(TM)! This is the 1st release featuring H2O purification and x^2 calculations.'
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
-      
+
       const matches = text.match(combined)
       expect(matches).toContain('(TM)')
       expect(matches).toContain('1st')
@@ -33,7 +33,7 @@ describe('Integration Tests', () => {
       const text = 'The reaction Ca(OH)2 + CO2 → CaCO3 + H2O occurs at 25°C.'
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
-      
+
       const matches = text.match(combined)
       expect(matches).toContain(')2')
       expect(matches).toContain('O2')
@@ -45,7 +45,7 @@ describe('Integration Tests', () => {
       const text = 'Copyright(C) 2025. Product(TM) and Brand(R) are registered trademarks.'
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
-      
+
       const matches = text.match(combined)
       expect(matches).toContain('(C)')
       expect(matches).toContain('(TM)')
@@ -56,7 +56,7 @@ describe('Integration Tests', () => {
       const text = 'As shown in the 21st century study[1], the 2nd law states that x^2 + y^2 = r^2.'
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
-      
+
       const matches = text.match(combined)
       expect(matches).toContain('21st')
       expect(matches).toContain('2nd')
@@ -69,9 +69,6 @@ describe('Integration Tests', () => {
   describe('Pattern Priority and Conflicts', () => {
     it('should handle conflicting patterns correctly', () => {
       // TM could be trademark or chemical element Tm (Thulium)
-      const text1 = 'Product TM is great'
-      const text2 = 'Tm2O3 is thulium oxide'
-      
       expect(PatternMatchers.isTrademark('TM')).toBe(true)
       expect(PatternMatchers.isChemicalElement('Tm2')).toBe(true)
     })
@@ -80,24 +77,24 @@ describe('Integration Tests', () => {
       const text = '1st(TM)H2O^2'
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
-      
+
       const matches = text.match(combined)
       expect(matches).toHaveLength(4)
       expect(matches).toContain('1st')
       expect(matches).toContain('(TM)')
       expect(matches).toContain('H2')
-      expect(matches).toContain('O^2')  // O is preceded by digit 2, so it matches
+      expect(matches).toContain('O^2') // O is preceded by digit 2, so it matches
     })
 
     it('should handle nested parentheses correctly', () => {
       const text = '((TM)) symbols and Brand (R) text'
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
-      
+
       const matches = text.match(combined)
       expect(matches).toContain('(TM)')
       expect(matches).toContain('(R)')
-      
+
       // Note: ((R)) won't match due to the negative lookahead for extra )
       const text2 = '((R)) should not match'
       const matches2 = text2.match(combined)
@@ -120,14 +117,14 @@ describe('Integration Tests', () => {
         
         Copyright(C) 2025 Company(R). All rights reserved.
       `
-      
+
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
       const matches = blogPost.match(combined)
-      
+
       expect(matches).toBeTruthy()
       expect(matches?.length).toBeGreaterThan(10)
-      
+
       // Verify specific matches
       expect(matches).toContain('(TM)')
       expect(matches).toContain('21st')
@@ -154,11 +151,11 @@ describe('Integration Tests', () => {
         
         Trademark(TM) and Copyright(C) notices apply.
       `
-      
+
       const patterns = createPatterns(config)
       const combined = createCombinedPattern(patterns, config)
       const matches = techDoc.match(combined)
-      
+
       expect(matches).toBeTruthy()
       expect(matches).toContain('1st')
       expect(matches).toContain('42nd')
@@ -179,16 +176,16 @@ describe('Integration Tests', () => {
         ...config,
         symbols: {
           ...config.symbols,
-          ordinals: false
-        }
+          ordinals: false,
+        },
       }
-      
+
       const patterns = createPatterns(customConfig)
       const combined = createCombinedPattern(patterns, customConfig)
-      
+
       const text = '1st place winner gets H2O and Product(TM)'
       const matches = text.match(combined)
-      
+
       expect(matches).not.toContain('1st')
       expect(matches).toContain('H2')
       expect(matches).toContain('(TM)')
@@ -201,15 +198,15 @@ describe('Integration Tests', () => {
           ...config.symbols,
           trademark: ['™'], // Only unicode, not (TM)
           registered: ['®'], // Only unicode, not (R)
-        }
+        },
       }
-      
+
       const patterns = createPatterns(customConfig)
       const combined = createCombinedPattern(patterns, customConfig)
-      
+
       const text = 'Product™ and Brand® vs Product(TM) and Brand(R)'
       const matches = text.match(combined)
-      
+
       expect(matches).toContain('™')
       expect(matches).toContain('®')
       // (TM) and (R) should not be matched with this config
@@ -223,10 +220,10 @@ describe('Integration Tests', () => {
       p1.textContent = 'Product(TM)'
       const p2 = document.createElement('p')
       p2.textContent = '1st place'
-      
+
       fragment.appendChild(p1)
       fragment.appendChild(p2)
-      
+
       expect(p1.textContent).toBe('Product(TM)')
       expect(p2.textContent).toBe('1st place')
     })
@@ -238,19 +235,19 @@ describe('Integration Tests', () => {
       const content = document.createElement('span')
       content.textContent = 'Product(TM) is 1st'
       host.appendChild(content)
-      
+
       expect(content.textContent).toBe('Product(TM) is 1st')
     })
 
     it('should handle dynamically added content', () => {
       const container = document.createElement('div')
       document.body.appendChild(container)
-      
+
       // Simulate dynamic content addition
       setTimeout(() => {
         container.innerHTML = 'New Product(TM) added'
       }, 0)
-      
+
       // In a real implementation, MutationObserver would detect this
       expect(container.parentNode).toBe(document.body)
     })
@@ -261,7 +258,7 @@ describe('Integration Tests', () => {
       const malformed = '<p>Product(TM) <span>unclosed'
       const div = document.createElement('div')
       div.innerHTML = malformed
-      
+
       // Should still be able to access text content
       expect(div.textContent).toContain('Product(TM)')
     })
@@ -271,7 +268,7 @@ describe('Integration Tests', () => {
       const div2 = document.createElement('div')
       div1.appendChild(div2)
       div2.appendChild(div1.cloneNode(true))
-      
+
       div1.textContent = 'Product(TM)'
       expect(div1.textContent).toBe('Product(TM)')
     })
@@ -279,13 +276,13 @@ describe('Integration Tests', () => {
     it('should handle very deeply nested structures', () => {
       let current = document.body
       const depth = 1000
-      
+
       for (let i = 0; i < depth; i++) {
         const div = document.createElement('div')
         current.appendChild(div)
         current = div
       }
-      
+
       current.textContent = 'Deep Product(TM)'
       expect(current.textContent).toBe('Deep Product(TM)')
     })
@@ -299,8 +296,8 @@ describe('Integration Tests', () => {
         { original: '1st', processed: '1st', ariaLabel: 'first' },
         { original: 'H2O', processed: 'H2O', ariaLabel: 'H 2 O' },
       ]
-      
-      results.forEach(({ original, ariaLabel }) => {
+
+      results.forEach(({ original }) => {
         const result = processMatch(original)
         if (result.modified && result.parts.length > 0) {
           // Verify that we have structured data for accessibility

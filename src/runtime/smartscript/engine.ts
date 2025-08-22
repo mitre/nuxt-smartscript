@@ -8,7 +8,6 @@ import { logger } from './logger'
 import {
   createFragmentFromParts,
   shouldExcludeElement,
-  shouldIncludeElement,
   isProcessed,
   markAsProcessed,
   resetProcessingFlags,
@@ -33,8 +32,8 @@ export function processTextNode(
 
   // Check if we actually modified the content
   // Either we have non-text parts (super/sub) OR the text content changed
-  const hasModifications = parts.some(p => p.type !== 'text') || 
-    parts.map(p => p.content).join('') !== text
+  const hasModifications = parts.some(p => p.type !== 'text')
+    || parts.map(p => p.content).join('') !== text
 
   if (hasModifications) {
     logger.debug('Found modifications, replacing node')
@@ -126,7 +125,7 @@ export function processContent(
   combinedPattern: RegExp,
 ): void {
   logger.info('processContent called with selectors:', config.selectors.include)
-  
+
   // Process each include selector
   config.selectors.include.forEach((selector) => {
     try {

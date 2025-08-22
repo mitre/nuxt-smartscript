@@ -11,7 +11,6 @@ import { logger } from './logger'
  */
 export function processMatch(matched: string): ProcessingResult {
   logger.debug('processMatch called with:', matched)
-  const parts: TextPart[] = []
 
   // Trademark symbols - Unicode character already positioned
   if (PatternMatchers.isTrademark(matched)) {
