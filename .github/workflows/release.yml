@@ -36,13 +36,13 @@ jobs:
       - name: Publish to npm
         run: |
           if [[ "${{ github.ref }}" == *"-beta"* ]]; then
-            npm publish --provenance --tag beta
+            npm publish --provenance --access public --tag beta
           elif [[ "${{ github.ref }}" == *"-alpha"* ]]; then
-            npm publish --provenance --tag alpha
+            npm publish --provenance --access public --tag alpha
           elif [[ "${{ github.ref }}" == *"-rc"* ]]; then
-            npm publish --provenance --tag rc
+            npm publish --provenance --access public --tag rc
           else
-            npm publish --provenance
+            npm publish --provenance --access public
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.SAF_NPM_TOKEN }}
