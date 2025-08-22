@@ -16,30 +16,30 @@ export default defineConfig({
   // Follow symlinks for linked markdown files
   vite: {
     resolve: {
-      preserveSymlinks: true
-    }
+      preserveSymlinks: true,
+    },
   },
 
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quick Start', link: '/quick-start' },
-      { 
+      {
         text: 'Guide',
         items: [
           { text: 'Getting Started', link: '/guide/getting-started' },
           { text: 'Vue Integration', link: '/vue-integration' },
           { text: 'Examples', link: '/examples' },
-          { text: 'Architecture', link: '/architecture' }
-        ]
+          { text: 'Architecture', link: '/architecture' },
+        ],
       },
-      { 
+      {
         text: 'API',
         items: [
           { text: 'Configuration', link: '/api/configuration' },
           { text: 'Composables', link: '/api/composables' },
-          { text: 'Plugin API', link: '/api/plugin' }
-        ]
+          { text: 'Plugin API', link: '/api/plugin' },
+        ],
       },
       { text: 'Contributing', link: '/contributing' },
     ],

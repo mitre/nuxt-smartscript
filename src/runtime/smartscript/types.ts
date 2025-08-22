@@ -3,7 +3,7 @@
  */
 
 export interface SuperscriptConfig {
-  debug?: boolean  // Enable debug logging
+  debug?: boolean // Enable debug logging
   symbols: {
     trademark: string[]
     registered: string[]

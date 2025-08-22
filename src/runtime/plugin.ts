@@ -33,7 +33,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     // Get runtime config or use defaults
     const runtimeConfig = nuxtApp.$config?.public?.smartscript || {}
     config = mergeConfig(runtimeConfig)
-    
+
     // Configure logger based on debug setting
     configureLogger(config.debug)
     logger.info('Plugin initializing...')
@@ -57,11 +57,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Create patterns
   const patterns = createPatterns(config)
   const combinedPattern = createCombinedPattern(patterns, config)
-  
+
   logger.debug('Patterns created:', {
     copyright: patterns.copyright,
     trademark: patterns.trademark,
-    combinedPattern
+    combinedPattern,
   })
 
   // Main processing function

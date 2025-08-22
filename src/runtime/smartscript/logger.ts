@@ -16,7 +16,7 @@ export const logger = createConsola({
 export function configureLogger(debug: boolean = false) {
   // In debug mode, show all logs including debug level
   // In production, only show info and above
-  logger.level = debug ? 4 : 3  // 4 = debug, 3 = info
+  logger.level = debug ? 4 : 3 // 4 = debug, 3 = info
 }
 
 // Re-export log levels for convenience
