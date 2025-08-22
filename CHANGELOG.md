@@ -5,6 +5,18 @@ All notable changes to nuxt-smartscript will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.1.2
+
+[compare changes](https://github.com/mitre/nuxt-smartscript/compare/v0.1.1...v0.1.2)
+
+### 🩹 Fixes
+
+- Add public access flag to npm publish ([3965e38](https://github.com/mitre/nuxt-smartscript/commit/3965e38))
+
+### ❤️ Contributors
+
+- Aaron Lippold ([@aaronlippold](https://github.com/aaronlippold))
+
 ## v0.1.1
 
 
