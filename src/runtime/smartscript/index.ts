@@ -49,6 +49,7 @@ export {
   processMatch,
   processText,
   needsProcessing,
+  clearProcessingCaches,
 } from './processor'
 
 // Export engine

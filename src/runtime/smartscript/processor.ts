@@ -6,6 +6,36 @@ import type { TextPart, ProcessingResult } from './types'
 import { PatternMatchers, PatternExtractors } from './patterns'
 import { logger } from './logger'
 
+// Cache for processed text to avoid redundant processing
+// WeakMap allows garbage collection when text nodes are removed
+const processedCache = new WeakMap<Text, TextPart[]>()
+
+// String-based cache for text processing results (LRU-style with size limit)
+const textResultCache = new Map<string, TextPart[]>()
+const MAX_CACHE_SIZE = 1000
+
+function getCachedOrProcess(text: string, pattern: RegExp): TextPart[] {
+  // Check cache first
+  const cached = textResultCache.get(text)
+  if (cached) {
+    logger.trace('Cache hit for text:', text.substring(0, 20))
+    return cached
+  }
+
+  // Process and cache
+  const result = processTextInternal(text, pattern)
+  
+  // LRU cache management
+  if (textResultCache.size >= MAX_CACHE_SIZE) {
+    // Remove oldest entry (first in map)
+    const firstKey = textResultCache.keys().next().value
+    textResultCache.delete(firstKey)
+  }
+  
+  textResultCache.set(text, result)
+  return result
+}
+
 /**
  * Process matched text and determine how to transform it
  */
@@ -132,9 +162,9 @@ export function processMatch(matched: string): ProcessingResult {
 }
 
 /**
- * Process a text string and split it into parts
+ * Internal text processing (without caching)
  */
-export function processText(text: string, pattern: RegExp): TextPart[] {
+function processTextInternal(text: string, pattern: RegExp): TextPart[] {
   const parts: TextPart[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
@@ -172,6 +202,13 @@ export function processText(text: string, pattern: RegExp): TextPart[] {
 }
 
 /**
+ * Process a text string and split it into parts (with caching)
+ */
+export function processText(text: string, pattern: RegExp): TextPart[] {
+  return getCachedOrProcess(text, pattern)
+}
+
+/**
  * Check if text needs processing
  */
 export function needsProcessing(text: string, pattern: RegExp): boolean {
@@ -180,4 +217,13 @@ export function needsProcessing(text: string, pattern: RegExp): boolean {
   const result = pattern.test(text)
   pattern.lastIndex = 0
   return result
+}
+
+/**
+ * Clear processing caches (useful for navigation or memory management)
+ */
+export function clearProcessingCaches(): void {
+  processedCache.clear?.() // WeakMap doesn't have clear in all browsers
+  textResultCache.clear()
+  logger.debug('Processing caches cleared')
 }

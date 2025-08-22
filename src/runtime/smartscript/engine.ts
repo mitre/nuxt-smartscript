@@ -3,7 +3,7 @@
  */
 
 import type { SuperscriptConfig, PatternSet } from './types'
-import { processText, needsProcessing } from './processor'
+import { processText, needsProcessing, clearProcessingCaches } from './processor'
 import { logger } from './logger'
 import {
   createFragmentFromParts,
@@ -46,6 +46,39 @@ export function processTextNode(
 }
 
 /**
+ * Create optimized TreeWalker filter
+ */
+function createTextNodeFilter(
+  config: SuperscriptConfig,
+  combinedPattern: RegExp,
+): NodeFilter {
+  // Pre-compile exclude check for better performance
+  const excludeSelectors = config.selectors.exclude
+  
+  return {
+    acceptNode: (node: Node): number => {
+      const text = node.textContent
+      
+      // Fast early exit for empty nodes
+      if (!text || !text.trim()) {
+        return NodeFilter.FILTER_REJECT
+      }
+
+      // Skip if parent is excluded (check once)
+      const parent = node.parentElement
+      if (parent && shouldExcludeElement(parent, excludeSelectors)) {
+        return NodeFilter.FILTER_REJECT
+      }
+
+      // Use cached pattern check
+      return needsProcessing(text, combinedPattern)
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_REJECT
+    },
+  }
+}
+
+/**
  * Process an element and its text nodes
  */
 export function processElement(
@@ -64,33 +97,12 @@ export function processElement(
     return
   }
 
-  // Create tree walker to find text nodes
+  // Create optimized tree walker
   logger.trace('processElement called, combinedPattern:', combinedPattern)
   const walker = document.createTreeWalker(
     element,
     NodeFilter.SHOW_TEXT,
-    {
-      acceptNode: (node: Node): number => {
-        // Skip empty text nodes
-        if (!node.textContent?.trim()) {
-          return NodeFilter.FILTER_REJECT
-        }
-
-        // Skip if parent is excluded
-        const parent = node.parentElement
-        if (parent && shouldExcludeElement(parent, config.selectors.exclude)) {
-          return NodeFilter.FILTER_REJECT
-        }
-
-        // Check if text contains any patterns
-        const textContent = node.textContent || ''
-        if (needsProcessing(textContent, combinedPattern)) {
-          return NodeFilter.FILTER_ACCEPT
-        }
-
-        return NodeFilter.FILTER_REJECT
-      },
-    },
+    createTextNodeFilter(config, combinedPattern),
   )
 
   // Collect nodes to process (avoid modifying during iteration)
@@ -117,6 +129,38 @@ export function processElement(
 }
 
 /**
+ * Batch process elements using requestAnimationFrame
+ */
+function batchProcessElements(
+  elements: Element[],
+  config: SuperscriptConfig,
+  patterns: PatternSet,
+  combinedPattern: RegExp,
+  batchSize = 10,
+): void {
+  let index = 0
+
+  function processBatch() {
+    const endIndex = Math.min(index + batchSize, elements.length)
+    
+    for (let i = index; i < endIndex; i++) {
+      processElement(elements[i], config, patterns, combinedPattern)
+    }
+    
+    index = endIndex
+    
+    if (index < elements.length) {
+      // Process next batch in next frame
+      requestAnimationFrame(processBatch)
+    }
+  }
+
+  if (elements.length > 0) {
+    requestAnimationFrame(processBatch)
+  }
+}
+
+/**
  * Process all matching elements in the document
  */
 export function processContent(
@@ -126,21 +170,33 @@ export function processContent(
 ): void {
   logger.info('processContent called with selectors:', config.selectors.include)
 
-  // Process each include selector
+  const allElements: Element[] = []
+
+  // Collect all elements first
   config.selectors.include.forEach((selector) => {
     try {
       const elements = document.querySelectorAll(selector)
       if (elements.length > 0) {
         logger.debug(`Found ${elements.length} elements for selector "${selector}"`)
+        allElements.push(...Array.from(elements))
       }
-      elements.forEach((element) => {
-        processElement(element, config, patterns, combinedPattern)
-      })
     }
     catch (error) {
       logger.warn(`Invalid selector: ${selector}`, error)
     }
   })
+
+  // Process in batches for better performance
+  if (allElements.length > 20) {
+    // Use batching for large element counts
+    batchProcessElements(allElements, config, patterns, combinedPattern)
+  }
+  else {
+    // Process immediately for small counts
+    allElements.forEach((element) => {
+      processElement(element, config, patterns, combinedPattern)
+    })
+  }
 }
 
 /**
@@ -148,6 +204,7 @@ export function processContent(
  */
 export function initializeForNavigation(): void {
   resetProcessingFlags()
+  clearProcessingCaches() // Clear caches on navigation for fresh processing
 }
 
 /**
