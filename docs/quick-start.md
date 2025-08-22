@@ -144,6 +144,6 @@ To prevent processing of specific content:
 
 ## Need Help?
 
-- Check our [troubleshooting guide](/troubleshooting)
+- Check our [troubleshooting guide](/guide/getting-started#troubleshooting)
 - View [architecture documentation](/architecture)
 - Report issues on [GitHub](https://github.com/mitre/nuxt-smartscript/issues)
