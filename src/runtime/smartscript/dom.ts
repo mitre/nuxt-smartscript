@@ -4,6 +4,7 @@
 
 import type { TextPart } from './types'
 import { logger } from './logger'
+import { CSS_CLASSES } from './config'
 
 // Pre-compiled regex patterns for performance
 const DIGITS_ONLY = /^\d+$/
@@ -21,23 +22,23 @@ export function createSuperscriptElement(
 
   switch (type) {
     case 'trademark':
-      sup.className = 'ss-sup ss-tm'
+      sup.className = `${CSS_CLASSES.superscript} ${CSS_CLASSES.trademark}`
       sup.setAttribute('aria-label', 'trademark')
       break
     case 'registered':
-      sup.className = 'ss-sup ss-reg'
+      sup.className = `${CSS_CLASSES.superscript} ${CSS_CLASSES.registered}`
       sup.setAttribute('aria-label', 'registered')
       break
     case 'ordinal':
-      sup.className = 'ss-sup ss-ordinal'
+      sup.className = `${CSS_CLASSES.superscript} ${CSS_CLASSES.ordinal}`
       sup.setAttribute('aria-label', content)
       break
     case 'math':
-      sup.className = 'ss-sup ss-math'
+      sup.className = `${CSS_CLASSES.superscript} ${CSS_CLASSES.math}`
       sup.setAttribute('aria-label', `superscript ${content}`)
       break
     default:
-      sup.className = 'ss-sup'
+      sup.className = CSS_CLASSES.superscript
       sup.setAttribute('aria-label', `superscript ${content}`)
   }
 
@@ -53,7 +54,7 @@ export function createSubscriptElement(
 ): HTMLElement {
   const sub = document.createElement('sub')
   sub.textContent = content
-  sub.className = 'ss-sub'
+  sub.className = CSS_CLASSES.subscript
 
   switch (type) {
     case 'chemical':

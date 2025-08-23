@@ -5,6 +5,18 @@
 import type { SuperscriptConfig } from './types'
 
 /**
+ * CSS class names used by SmartScript (not configurable)
+ */
+export const CSS_CLASSES = {
+  superscript: 'ss-sup',
+  subscript: 'ss-sub',
+  trademark: 'ss-tm',
+  registered: 'ss-reg',
+  ordinal: 'ss-ordinal',
+  math: 'ss-math',
+} as const
+
+/**
  * Default configuration values
  */
 export const DEFAULT_CONFIG: SuperscriptConfig = {
@@ -34,6 +46,9 @@ export const DEFAULT_CONFIG: SuperscriptConfig = {
       'style',
       '.no-superscript',
       '[data-no-superscript]',
+      // Exclude our own generated elements
+      'sup.ss-sup',
+      'sub.ss-sub',
     ],
   },
   performance: {

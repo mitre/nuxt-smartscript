@@ -12,6 +12,7 @@ import {
   markAsProcessed,
   resetProcessingFlags,
 } from './dom'
+import { CSS_CLASSES } from './config'
 
 /**
  * Process a single text node
@@ -54,11 +55,11 @@ function createTextNodeFilter(
 ): NodeFilter {
   // Pre-compile exclude check for better performance
   const excludeSelectors = config.selectors.exclude
-  
+
   return {
     acceptNode: (node: Node): number => {
       const text = node.textContent
-      
+
       // Fast early exit for empty nodes
       if (!text || !text.trim()) {
         return NodeFilter.FILTER_REJECT
@@ -67,6 +68,14 @@ function createTextNodeFilter(
       // Skip if parent is excluded (check once)
       const parent = node.parentElement
       if (parent && shouldExcludeElement(parent, excludeSelectors)) {
+        return NodeFilter.FILTER_REJECT
+      }
+
+      // Skip if parent is one of our generated elements
+      if (parent && (
+        (parent.tagName === 'SUP' && parent.classList.contains(CSS_CLASSES.superscript))
+        || (parent.tagName === 'SUB' && parent.classList.contains(CSS_CLASSES.subscript))
+      )) {
         return NodeFilter.FILTER_REJECT
       }
 
@@ -142,13 +151,13 @@ function batchProcessElements(
 
   function processBatch() {
     const endIndex = Math.min(index + batchSize, elements.length)
-    
+
     for (let i = index; i < endIndex; i++) {
       processElement(elements[i], config, patterns, combinedPattern)
     }
-    
+
     index = endIndex
-    
+
     if (index < elements.length) {
       // Process next batch in next frame
       requestAnimationFrame(processBatch)
