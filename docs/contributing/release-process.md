@@ -81,10 +81,11 @@ This document describes the release process for @mitre/nuxt-smartscript.
 
 6. **Run release command**
    ```bash
-   pnpm release            # Auto version from commits
-   # or for specific version:
-   pnpm release -- --minor # For 0.x.0 bump
-   pnpm release -- --patch # For 0.0.x bump
+   pnpm release         # Auto version from commits
+   # or for specific version type:
+   pnpm release:minor   # Force minor bump (0.x.0)
+   pnpm release:patch   # Force patch bump (0.0.x)
+   pnpm release:major   # Force major bump (x.0.0)
    ```
 
 ## Prerequisites for Direct Release
@@ -107,6 +108,7 @@ The release process is fully automated:
    - Generates/updates CHANGELOG.md
    - Creates git commit and tag
    - Pushes to GitHub with tags
+   - **Does NOT open browser** (CHANGELOGEN_NO_GITHUB=true is set)
 3. **GitHub Actions automatically**:
    - Runs tests and linting
    - Builds the module
@@ -136,9 +138,9 @@ This analyzes your commits and determines the version bump:
 
 ```bash
 # Force specific version type
-pnpm release -- --patch    # 0.1.0 → 0.1.1
-pnpm release -- --minor    # 0.1.0 → 0.2.0
-pnpm release -- --major    # 0.1.0 → 1.0.0
+pnpm release:patch    # 0.1.0 → 0.1.1
+pnpm release:minor    # 0.1.0 → 0.2.0
+pnpm release:major    # 0.1.0 → 1.0.0
 ```
 
 ### Pre-releases
