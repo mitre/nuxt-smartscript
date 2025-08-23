@@ -85,6 +85,59 @@
 </template>
 ```
 
+## CSS Customization Example
+
+### Customizing Styles
+
+```css
+/* app.css */
+
+/* Make trademark symbols smaller in headers */
+h1 sup.ss-sup.ss-tm,
+h2 sup.ss-sup.ss-tm {
+  font-size: 0.5em;
+  top: -0.8em;
+}
+
+/* Different color for chemical subscripts */
+sub.ss-sub {
+  color: #0066cc;
+}
+
+/* Custom styling for ordinals */
+sup.ss-sup.ss-ordinal {
+  font-weight: bold;
+  font-size: 0.6em;
+}
+
+/* Override registered symbol positioning */
+sup.ss-sup.ss-reg {
+  vertical-align: baseline;
+  position: relative;
+  top: -0.5em;
+}
+```
+
+### Accessing CSS Classes Programmatically
+
+```typescript
+// composables/useCustomStyles.ts
+import { CSS_CLASSES } from 'nuxt-smartscript'
+
+export function useCustomStyles() {
+  // Add custom handling for specific elements
+  onMounted(() => {
+    // Find all trademark elements
+    const trademarks = document.querySelectorAll(`.${CSS_CLASSES.trademark}`)
+    
+    // Add custom attributes or classes
+    trademarks.forEach(el => {
+      el.setAttribute('data-tooltip', 'Trademark')
+    })
+  })
+}
+```
+
 ## Dynamic Content
 
 The plugin automatically handles dynamic content:

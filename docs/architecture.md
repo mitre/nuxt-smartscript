@@ -58,14 +58,32 @@ export interface TextPart {
 **When to modify:** When adding new configuration options or data structures.
 
 ### `config.ts` - Configuration Management
-**Responsibility:** Default configuration, validation, and merging user configs.
+**Responsibility:** Default configuration, CSS class constants, validation, and merging user configs.
 
 ```typescript
+// Centralized CSS class names for consistency
+export const CSS_CLASSES = {
+  superscript: 'ss-sup',
+  subscript: 'ss-sub',
+  trademark: 'ss-tm',
+  registered: 'ss-reg',
+  ordinal: 'ss-ordinal',
+  math: 'ss-math',
+} as const
+
 export const DEFAULT_CONFIG: SuperscriptConfig = {
   symbols: {
     trademark: ['™', '(TM)', 'TM'],
     registered: ['®', '(R)'],
     // ...
+  },
+  selectors: {
+    exclude: [
+      // Automatically excludes processed elements
+      `sup.${CSS_CLASSES.superscript}`,
+      `sub.${CSS_CLASSES.subscript}`,
+      // ...
+    ]
   }
 }
 
@@ -73,7 +91,12 @@ export function mergeConfig(userConfig: Partial<SuperscriptConfig>): Superscript
 export function validateConfig(config: SuperscriptConfig): string[]
 ```
 
-**When to modify:** When adding new configuration defaults or validation rules.
+**Key features:**
+- **CSS_CLASSES constant:** Centralizes all CSS class names to avoid hardcoding
+- **Automatic exclusion:** Processed elements are automatically excluded to prevent double-processing
+- **Single source of truth:** All class names are defined in one place for maintainability
+
+**When to modify:** When adding new configuration defaults, CSS classes, or validation rules.
 
 ### `patterns.ts` - Pattern Management
 **Responsibility:** Regex patterns and pattern matching utilities.

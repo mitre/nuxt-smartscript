@@ -2,18 +2,30 @@
 
 This document describes the release process for nuxt-smartscript.
 
-## Overview
+## Two Release Paths
 
-We use [changelogen](https://github.com/unjs/changelogen) for automated versioning and changelog generation, following the standard Nuxt module patterns.
+### 1. PR-Based Release (Recommended for Most Contributors)
 
-## Prerequisites
+**For most contributors**: Create a PR with your changes, and the maintainers will handle the release.
+
+1. Create your feature branch
+2. Make your changes following conventional commits
+3. Create a PR to main branch
+4. After PR is merged, maintainers will trigger a release
+
+### 2. Direct Release (Maintainers Only)
+
+**For maintainers with npm publish rights**: Direct release from main branch.
+
+## Prerequisites for Direct Release
 
 Before releasing:
 1. Ensure you have push access to the repository
 2. Ensure you have npm publish rights for the package
 3. `SAF_NPM_TOKEN` must be set as a GitHub secret for automated publishing
+4. You must be on the main branch with a clean working tree
 
-## How It Works
+## How Direct Release Works
 
 The release process is fully automated:
 
@@ -31,11 +43,16 @@ The release process is fully automated:
    - Publishes to npm with provenance
    - Creates GitHub release
 
-## Release Commands
+## Release Commands (Maintainers Only)
 
 ### Standard Release
 
 ```bash
+# PREREQUISITE: Must be on main branch with clean working tree
+git checkout main
+git pull origin main
+git status  # Should show "nothing to commit, working tree clean"
+
 # Automatic version based on commits (recommended)
 pnpm release
 ```
@@ -141,6 +158,36 @@ pnpm lint
 1. Check Actions tab: https://github.com/mitre/nuxt-smartscript/actions
 2. Verify `SAF_NPM_TOKEN` is set in repository secrets
 3. Check npm publish permissions
+
+## For Contributors (PR-Based Workflow)
+
+If you're contributing but don't have release permissions:
+
+1. **Create your branch**
+   ```bash
+   git checkout -b feat/your-feature-name
+   # or
+   git checkout -b fix/your-bug-fix
+   ```
+
+2. **Make changes with conventional commits**
+   ```bash
+   git add .
+   git commit -m "feat: add amazing new feature"
+   # or
+   git commit -m "fix: resolve issue with trademark processing"
+   ```
+
+3. **Push and create PR**
+   ```bash
+   git push origin your-branch-name
+   # Then create PR on GitHub
+   ```
+
+4. **After PR is merged**
+   - Maintainers will run `pnpm release` when ready
+   - Your changes will be included in the next release
+   - You'll be credited in the changelog automatically
 
 ## Version Guidelines
 
