@@ -5,6 +5,63 @@ All notable changes to nuxt-smartscript will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.3.0
+
+[compare changes](https://github.com/mitre/nuxt-smartscript/compare/v0.1.2...v0.3.0)
+
+### 🚀 Enhancements
+
+- Add CSS variables for runtime style customization ([4e48b98](https://github.com/mitre/nuxt-smartscript/commit/4e48b98))
+- Add custom pattern overrides for advanced users ([022bd71](https://github.com/mitre/nuxt-smartscript/commit/022bd71))
+- Add transformation control to enable/disable specific types ([9ed7ccd](https://github.com/mitre/nuxt-smartscript/commit/9ed7ccd))
+- ⚠️  Migrate to @mitre npm scope and align with org standards ([8dc3413](https://github.com/mitre/nuxt-smartscript/commit/8dc3413))
+
+### 🔥 Performance
+
+- Add advanced performance optimizations ([2cd0ab3](https://github.com/mitre/nuxt-smartscript/commit/2cd0ab3))
+
+### 🩹 Fixes
+
+- Render trademark symbol as superscript for consistency ([bf8ecdf](https://github.com/mitre/nuxt-smartscript/commit/bf8ecdf))
+- Prevent double processing and fix H1-H6 header detection ([6145303](https://github.com/mitre/nuxt-smartscript/commit/6145303))
+
+### 💅 Refactors
+
+- ⚠️  Switch to browser-native CSS positioning and ss- prefix ([8311b3f](https://github.com/mitre/nuxt-smartscript/commit/8311b3f))
+- DRY improvements and performance optimizations ([2834781](https://github.com/mitre/nuxt-smartscript/commit/2834781))
+- Reorganize test structure into unit, integration, performance, and e2e ([ea9f4a3](https://github.com/mitre/nuxt-smartscript/commit/ea9f4a3))
+
+### 📖 Documentation
+
+- Improve development and release documentation ([d9a6ce0](https://github.com/mitre/nuxt-smartscript/commit/d9a6ce0))
+- Clarify release process for contributors and maintainers ([ef8d5d2](https://github.com/mitre/nuxt-smartscript/commit/ef8d5d2))
+
+### 📦 Build
+
+- Use compiled module in playground for real-world testing ([f576e3f](https://github.com/mitre/nuxt-smartscript/commit/f576e3f))
+
+### 🏡 Chore
+
+- Simplify release script to avoid browser confusion ([df68f1c](https://github.com/mitre/nuxt-smartscript/commit/df68f1c))
+- Fix exports and add Nuxt compatibility date ([feb621d](https://github.com/mitre/nuxt-smartscript/commit/feb621d))
+- **release:** V0.1.3 ([0033257](https://github.com/mitre/nuxt-smartscript/commit/0033257))
+- Improve release scripts to prevent version and browser issues ([71e6e67](https://github.com/mitre/nuxt-smartscript/commit/71e6e67))
+- **release:** V0.1.3" ([e22869b](https://github.com/mitre/nuxt-smartscript/commit/e22869b))
+
+### ✅ Tests
+
+- Add comprehensive font testing to playground ([c108ea7](https://github.com/mitre/nuxt-smartscript/commit/c108ea7))
+- Add comprehensive performance test suite ([f190635](https://github.com/mitre/nuxt-smartscript/commit/f190635))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Migrate to @mitre npm scope and align with org standards ([8dc3413](https://github.com/mitre/nuxt-smartscript/commit/8dc3413))
+- ⚠️  Switch to browser-native CSS positioning and ss- prefix ([8311b3f](https://github.com/mitre/nuxt-smartscript/commit/8311b3f))
+
+### ❤️ Contributors
+
+- Aaron Lippold ([@aaronlippold](https://github.com/aaronlippold))
+
 ## v0.1.2
 
 [compare changes](https://github.com/mitre/nuxt-smartscript/compare/v0.1.1...v0.1.2)
