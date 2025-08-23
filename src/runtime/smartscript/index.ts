@@ -20,6 +20,7 @@ export type {
 // Export configuration
 export {
   DEFAULT_CONFIG,
+  CSS_CLASSES,
   mergeConfig,
   validateConfig,
 } from './config'

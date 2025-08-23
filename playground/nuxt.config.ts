@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   modules: ['../dist/module.mjs'],
   devtools: { enabled: true },
+  compatibilityDate: '2025-08-22',
   smartscript: {
     // Module is enabled by default
     // You can customize options here for testing
