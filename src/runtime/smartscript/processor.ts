@@ -24,14 +24,14 @@ function getCachedOrProcess(text: string, pattern: RegExp): TextPart[] {
 
   // Process and cache
   const result = processTextInternal(text, pattern)
-  
+
   // LRU cache management
   if (textResultCache.size >= MAX_CACHE_SIZE) {
     // Remove oldest entry (first in map)
     const firstKey = textResultCache.keys().next().value
     textResultCache.delete(firstKey)
   }
-  
+
   textResultCache.set(text, result)
   return result
 }
@@ -82,13 +82,46 @@ export function processMatch(matched: string): ProcessingResult {
   if (PatternMatchers.isOrdinal(matched)) {
     const ordinal = PatternExtractors.extractOrdinal(matched)
     if (ordinal) {
-      logger.debug('Ordinal match confirmed:', matched, '→', ordinal)
-      return {
-        modified: true,
-        parts: [
-          { type: 'text', content: ordinal.number },
-          { type: 'super', content: ordinal.suffix },
-        ],
+      // Validate that the ordinal suffix is correct for the number
+      const num = Number.parseInt(ordinal.number, 10)
+      const lastDigit = num % 10
+      const lastTwoDigits = num % 100
+
+      let expectedSuffix: string
+      if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+        expectedSuffix = 'th' // 11th, 12th, 13th
+      }
+      else if (lastDigit === 1) {
+        expectedSuffix = 'st' // 1st, 21st, 31st, etc.
+      }
+      else if (lastDigit === 2) {
+        expectedSuffix = 'nd' // 2nd, 22nd, 32nd, etc.
+      }
+      else if (lastDigit === 3) {
+        expectedSuffix = 'rd' // 3rd, 23rd, 33rd, etc.
+      }
+      else {
+        expectedSuffix = 'th' // 4th, 5th, 6th, etc.
+      }
+
+      // Only transform if the suffix is correct
+      if (ordinal.suffix === expectedSuffix) {
+        logger.debug('Ordinal match confirmed:', matched, '→', ordinal)
+        return {
+          modified: true,
+          parts: [
+            { type: 'text', content: ordinal.number },
+            { type: 'super', content: ordinal.suffix },
+          ],
+        }
+      }
+      else {
+        // Invalid ordinal - don't transform
+        logger.trace('Invalid ordinal suffix:', matched)
+        return {
+          modified: false,
+          parts: [{ type: 'text', content: matched }],
+        }
       }
     }
   }
@@ -108,8 +141,12 @@ export function processMatch(matched: string): ProcessingResult {
     }
   }
 
-  // Chemical element formulas
+  // Chemical element formulas - exclude H1-H6 HTML headers ONLY when standalone
   if (PatternMatchers.isChemicalElement(matched)) {
+    // Skip H1-H6 ONLY when they appear to be HTML headers (standalone)
+    // H2 in "H2O" should still be processed as a chemical
+    // We check context in the full text processing, not here
+
     const chemical = PatternExtractors.extractChemicalElement(matched)
     if (chemical) {
       logger.debug('Chemical element match:', matched, '→', chemical)
@@ -173,6 +210,22 @@ function processTextInternal(text: string, pattern: RegExp): TextPart[] {
   pattern.lastIndex = 0
 
   while ((match = pattern.exec(text)) !== null) {
+    const matchedText = match[0]
+
+    // Special handling for H1-H6 patterns - skip if standalone (not followed by uppercase)
+    if (/^H[1-6]$/.test(matchedText)) {
+      const nextCharIndex = match.index + matchedText.length
+      const nextChar = text[nextCharIndex]
+
+      if (!nextChar || !/[A-Z]/.test(nextChar)) {
+        // Standalone H1-H6 - skip this match entirely
+        logger.trace('Skipping standalone H1-H6 pattern:', matchedText)
+        // Move the pattern's lastIndex forward to skip this match
+        pattern.lastIndex = match.index + 1
+        continue
+      }
+    }
+
     // Add text before match
     if (match.index > lastIndex) {
       parts.push({
@@ -182,7 +235,7 @@ function processTextInternal(text: string, pattern: RegExp): TextPart[] {
     }
 
     // Process the matched text
-    const result = processMatch(match[0])
+    const result = processMatch(matchedText)
     logger.trace('processMatch returned:', result)
     parts.push(...result.parts)
 
