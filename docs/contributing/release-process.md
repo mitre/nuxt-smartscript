@@ -4,18 +4,88 @@ This document describes the release process for nuxt-smartscript.
 
 ## Two Release Paths
 
-### 1. PR-Based Release (Recommended for Most Contributors)
+### Path 1: Contributors (Via Pull Request)
 
-**For most contributors**: Create a PR with your changes, and the maintainers will handle the release.
+**Standard workflow for all contributors:**
 
-1. Create your feature branch
-2. Make your changes following conventional commits
-3. Create a PR to main branch
-4. After PR is merged, maintainers will trigger a release
+1. **Create feature branch**
+   ```bash
+   git checkout -b feat/your-feature-name
+   # or fix/your-bug-fix, docs/your-docs-update, etc.
+   ```
 
-### 2. Direct Release (Maintainers Only)
+2. **Make your changes**
+   - Write your code
+   - **Add tests for all new features**
+   - Update documentation as needed
 
-**For maintainers with npm publish rights**: Direct release from main branch.
+3. **Ensure quality**
+   ```bash
+   pnpm test        # All tests must pass (including your new ones)
+   pnpm lint        # Code must be clean
+   pnpm dev:prepare # Test in playground if needed
+   ```
+
+4. **Commit with conventional format** (see [Commit Conventions](#changelog-conventions))
+   ```bash
+   git add .
+   git commit -m "feat: add awesome new feature"
+   # Types: feat:, fix:, docs:, chore:, test:, refactor:, perf:
+   ```
+
+5. **Push to your fork/branch**
+   ```bash
+   git push origin your-branch-name
+   ```
+
+6. **Create Pull Request**
+   - PR description should explain the change
+   - Link any related issues
+   - Wait for CI/CD checks to pass
+
+7. **After review and merge**
+   - **You're done!** 
+   - Maintainers will handle release when appropriate
+   - Your commits will appear in auto-generated changelog
+
+### Path 2: Maintainers (With Release Rights)
+
+**Maintainers should also use branches, but can release after merge:**
+
+1. **Create feature branch** (same as contributors)
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+
+2. **Develop and test** (same quality standards)
+   ```bash
+   pnpm test        # Must pass
+   pnpm lint        # Must be clean
+   ```
+
+3. **Push branch and create PR** (even as maintainer)
+   ```bash
+   git push origin your-branch-name
+   # Create PR for review/CI checks
+   ```
+
+4. **After PR is merged to main**
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
+5. **Wait for CI/CD to pass on main**
+   - Check GitHub Actions for green checkmark
+   - Never release with failing CI
+
+6. **Run release command**
+   ```bash
+   pnpm release            # Auto version from commits
+   # or for specific version:
+   pnpm release -- --minor # For 0.x.0 bump
+   pnpm release -- --patch # For 0.0.x bump
+   ```
 
 ## Prerequisites for Direct Release
 
