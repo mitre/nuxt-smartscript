@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { createPatterns, createCombinedPattern } from '../src/runtime/smartscript/patterns'
-import { processMatch } from '../src/runtime/smartscript/processor'
-import { DEFAULT_CONFIG } from '../src/runtime/smartscript/config'
+import { createPatterns, createCombinedPattern } from '../../src/runtime/smartscript/patterns'
+import { processMatch } from '../../src/runtime/smartscript/processor'
+import { DEFAULT_CONFIG } from '../../src/runtime/smartscript/config'
 
 describe('Mathematical Notation Support', () => {
   const config = DEFAULT_CONFIG
@@ -189,6 +189,34 @@ describe('Mathematical Notation Support', () => {
       expect(result2.parts).toHaveLength(2)
       expect(result2.parts[0].content).toBe('x')
       expect(result2.parts[1].content).toBe('2n') // Braces removed
+    })
+
+    it('should handle nested braces in math', () => {
+      const pattern = createPatterns(config).mathSuper
+      expect('x^{a^2}'.match(pattern)).toContain('x^{a^2}')
+    })
+
+    it('should not match incomplete patterns', () => {
+      const superPattern = createPatterns(config).mathSuper
+      const subPattern = createPatterns(config).mathSub
+
+      expect('x^'.match(superPattern)).toBeNull()
+      expect('x^{'.match(superPattern)).toBeNull()
+      expect('x^{unclosed'.match(superPattern)).toBeNull()
+
+      expect('x_'.match(subPattern)).toBeNull()
+      expect('x_{'.match(subPattern)).toBeNull()
+      expect('x_{unclosed'.match(subPattern)).toBeNull()
+    })
+
+    it('should handle various complex patterns', () => {
+      const superPattern = createPatterns(config).mathSuper
+      const subPattern = createPatterns(config).mathSub
+
+      expect('x^{n+1}'.match(superPattern)).toContain('x^{n+1}')
+      expect('x^{2n}'.match(superPattern)).toContain('x^{2n}')
+      expect('x_{i+1}'.match(subPattern)).toContain('x_{i+1}')
+      expect('x_{2n}'.match(subPattern)).toContain('x_{2n}')
     })
   })
 })

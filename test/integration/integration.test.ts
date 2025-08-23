@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { JSDOM } from 'jsdom'
-import { createPatterns, createCombinedPattern, PatternMatchers } from '../src/runtime/smartscript/patterns'
-import { processMatch } from '../src/runtime/smartscript/processor'
-import { DEFAULT_CONFIG } from '../src/runtime/smartscript/config'
-import type { SuperscriptConfig } from '../src/runtime/smartscript/types'
+import { createPatterns, createCombinedPattern, PatternMatchers } from '../../src/runtime/smartscript/patterns'
+import { processMatch } from '../../src/runtime/smartscript/processor'
+import { DEFAULT_CONFIG } from '../../src/runtime/smartscript/config'
+import type { SuperscriptConfig } from '../../src/runtime/smartscript/types'
 
 describe('Integration Tests', () => {
   let dom: JSDOM
@@ -305,6 +305,91 @@ describe('Integration Tests', () => {
           expect(result.parts.length).toBeGreaterThan(0)
         }
       })
+    })
+  })
+
+  describe('Unicode and Special Characters', () => {
+    it('should handle text with existing unicode symbols', () => {
+      const text = '™®©'
+      expect(text.includes('™')).toBe(true)
+      expect(text.includes('®')).toBe(true)
+      expect(text.includes('©')).toBe(true)
+    })
+
+    it('should handle mixed ASCII and unicode', () => {
+      const pattern = /™|\(TM\)/g
+      expect('Product™ and Product(TM)'.match(pattern)).toEqual(['™', '(TM)'])
+    })
+
+    it('should handle text with emojis', () => {
+      const pattern = /\(TM\)/g
+      const text = '🚀 Product(TM) 🎉'
+      expect(text.match(pattern)).toEqual(['(TM)'])
+    })
+
+    it('should handle text with special whitespace', () => {
+      const pattern = /\(TM\)/g
+      const nbsp = '\u00A0' // Non-breaking space
+      const text = `Product${nbsp}(TM)`
+      expect(text.match(pattern)).toEqual(['(TM)'])
+    })
+  })
+
+  describe('Internationalization Edge Cases', () => {
+    it('should handle non-English text with patterns', () => {
+      const pattern = /\(TM\)/g
+      const texts = [
+        'Produit(TM) français',
+        'Produkt(TM) deutsch',
+        '製品(TM)日本語',
+        'Продукт(TM) русский',
+        '产品(TM)中文',
+      ]
+
+      texts.forEach((text) => {
+        expect(text.match(pattern)).toEqual(['(TM)'])
+      })
+    })
+
+    it('should handle RTL text', () => {
+      const pattern = /\(TM\)/g
+      const text = 'מוצר(TM)עברית'
+      expect(text.match(pattern)).toEqual(['(TM)'])
+    })
+  })
+
+  describe('Mixed Content Edge Cases', () => {
+    it('should handle multiple pattern types in one text', () => {
+      const text = 'Product(TM) is 1st with H2O and x^2'
+      const tmPattern = /\(TM\)/g
+      const ordPattern = /\b(\d+)(st|nd|rd|th)\b/g
+      const chemPattern = /([A-Z][a-z]?)(\d+)/g
+      const mathPattern = /\^(\d+)/g
+
+      expect(text.match(tmPattern)).toEqual(['(TM)'])
+      expect(text.match(ordPattern)).toEqual(['1st'])
+      expect(text.match(chemPattern)).toEqual(['H2'])
+      expect(text.match(mathPattern)).toEqual(['^2'])
+    })
+
+    it('should handle overlapping pattern possibilities', () => {
+      // R could be element or registered mark
+      const rPattern = /\(R\)/g
+      const chemPattern = /\bR\d+/g
+
+      const text1 = 'Brand(R) formula'
+      const text2 = 'R2 resistance'
+
+      expect(text1.match(rPattern)).toEqual(['(R)'])
+      expect(text2.match(chemPattern)).toEqual(['R2'])
+    })
+
+    it('should handle patterns at word boundaries correctly', () => {
+      const tmPattern = /\bTM\b/g
+      expect('TM'.match(tmPattern)).toEqual(['TM'])
+      expect('HTML'.match(tmPattern)).toBeNull()
+      expect('TMNT'.match(tmPattern)).toBeNull()
+      expect('ATM'.match(tmPattern)).toBeNull()
     })
   })
 })
