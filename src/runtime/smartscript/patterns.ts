@@ -3,6 +3,7 @@
  */
 
 import type { PatternSet, SuperscriptConfig } from './types'
+import { logger } from './logger'
 
 // ============================================
 // Shared Regex Pattern Sources (DRY)
@@ -14,7 +15,11 @@ const REGISTERED_PATTERN = /®|\(R\)(?!\))/
 const COPYRIGHT_PATTERN = /©|\(C\)(?!\))/
 
 // Typography patterns
+// Ordinal pattern - matches ANY number with st/nd/rd/th suffix
+// Validation of correct suffix happens in processMatch() for simplicity
 const ORDINALS_PATTERN = /\b(\d+)(st|nd|rd|th)\b/
+// Chemical pattern - standard pattern for all chemicals
+// H1-H6 exclusion is handled via context checking in processTextInternal
 const CHEMICALS_PATTERN = /([A-Z][a-z]?)(\d+)|\)(\d+)/
 
 // Math notation patterns (with lookbehind for context)
@@ -25,6 +30,7 @@ const MATH_SUB_PATTERN = /(?<=^|[\s=+\-*/().,])([a-z])_(\d+|[a-z]|\{[^}]+\})/i
 const TRADEMARK_VALIDATE = /^(?:™|\(TM\)|TM)$/
 const REGISTERED_VALIDATE = /^(?:®|\(R\))$/
 const ORDINAL_VALIDATE = /^\d+(?:st|nd|rd|th)$/
+// Standard chemical validation - H1-H6 exclusion is handled in processTextInternal
 const CHEMICAL_ELEMENT_VALIDATE = /^[A-Z][a-z]?\d+$/
 const CHEMICAL_PARENS_VALIDATE = /^\)\d+$/
 const MATH_SUPER_VALIDATE = /^[a-z]\^/i
@@ -32,29 +38,82 @@ const MATH_SUB_VALIDATE = /^[a-z]_/i
 
 // Extraction patterns (used by PatternExtractors)
 const ORDINAL_EXTRACT = /^(\d+)(st|nd|rd|th)$/
+// Standard extraction - H1-H6 exclusion is handled in processTextInternal
 const CHEMICAL_ELEMENT_EXTRACT = /^([A-Z][a-z]?)(\d+)$/
 const CHEMICAL_PARENS_EXTRACT = /^\)(\d+)$/
 const MATH_VARIABLE_EXTRACT = /^([a-z])[\^_](.+)$/i
 
 /**
+ * Safely create a regex pattern from a string
+ */
+function safeCreateRegex(pattern: string | undefined, defaultPattern: RegExp, name: string): RegExp {
+  if (!pattern) {
+    return new RegExp(defaultPattern.source, 'g')
+  }
+
+  try {
+    // Test if the pattern is valid
+    const regex = new RegExp(pattern, 'g')
+    // Test it doesn't throw on execution
+    'test'.match(regex)
+    logger.debug('Custom pattern applied for:', name, '→', pattern)
+    return regex
+  }
+  catch (error) {
+    logger.warn('Invalid custom pattern for:', name, '→', pattern)
+    logger.debug('Pattern validation error:', error)
+    logger.info('Using default pattern for:', name)
+    // Fall back to default pattern
+    return new RegExp(defaultPattern.source, 'g')
+  }
+}
+
+/**
  * Create regex patterns based on configuration
  */
-export function createPatterns(_config: SuperscriptConfig): PatternSet {
+export function createPatterns(config: SuperscriptConfig): PatternSet {
+  // Create a dummy pattern that never matches
+  const NEVER_MATCH = /\b\B/g
+
+  // Get transformation settings with defaults
+  const transforms = {
+    trademark: config.transformations?.trademark !== false,
+    registered: config.transformations?.registered !== false,
+    copyright: config.transformations?.copyright !== false,
+    ordinals: config.transformations?.ordinals !== false,
+    chemicals: config.transformations?.chemicals !== false,
+    mathSuper: config.transformations?.mathSuper !== false,
+    mathSub: config.transformations?.mathSub !== false,
+  }
+
+  // Get custom patterns if provided
+  const custom = config.customPatterns || {}
+
   return {
     // Matches ™, (TM), or standalone TM
-    trademark: new RegExp(TRADEMARK_PATTERN.source, 'g'),
+    trademark: transforms.trademark
+      ? safeCreateRegex(custom.trademark, TRADEMARK_PATTERN, 'trademark')
+      : NEVER_MATCH,
 
     // Matches ®, (R) but not (R))
-    registered: new RegExp(REGISTERED_PATTERN.source, 'g'),
+    registered: transforms.registered
+      ? safeCreateRegex(custom.registered, REGISTERED_PATTERN, 'registered')
+      : NEVER_MATCH,
 
     // Matches ©, (C) but not (C))
-    copyright: new RegExp(COPYRIGHT_PATTERN.source, 'g'),
+    copyright: transforms.copyright
+      ? safeCreateRegex(custom.copyright, COPYRIGHT_PATTERN, 'copyright')
+      : NEVER_MATCH,
 
     // Matches ordinal numbers (1st, 2nd, 3rd, 4th, etc.)
-    ordinals: new RegExp(ORDINALS_PATTERN.source, 'g'),
+    ordinals: transforms.ordinals
+      ? safeCreateRegex(custom.ordinals, ORDINALS_PATTERN, 'ordinals')
+      : NEVER_MATCH,
 
     // Matches chemical formulas: H2, SO4, )3
-    chemicals: new RegExp(CHEMICALS_PATTERN.source, 'g'),
+    chemicals: transforms.chemicals
+      ? safeCreateRegex(custom.chemicals, CHEMICALS_PATTERN, 'chemicals')
+      : NEVER_MATCH,
 
     // Matches math superscript notation: x^2, x^n, x^{expr}
     // Pattern: /(?<=^|[\s=+\-*/().,\d]|[a-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/g
@@ -79,12 +138,16 @@ export function createPatterns(_config: SuperscriptConfig): PatternSet {
     // Examples that DON'T MATCH:
     // - "file^name" - 'e' is after 'l' but we still match (limitation)
     // - "MAX^2" - 'X' is after uppercase 'A' (blocked by lookbehind)
-    mathSuper: new RegExp(MATH_SUPER_PATTERN.source, 'g'),
+    mathSuper: transforms.mathSuper
+      ? safeCreateRegex(custom.mathSuper, MATH_SUPER_PATTERN, 'mathSuper')
+      : NEVER_MATCH,
 
     // Matches math subscript notation: x_1, x_n, x_{expr}
     // Pattern uses lookbehind to prevent matching in identifiers
     // Examples: "x_1" → match, "file_name" → no match
-    mathSub: new RegExp(MATH_SUB_PATTERN.source, 'gi'),
+    mathSub: transforms.mathSub
+      ? safeCreateRegex(custom.mathSub, MATH_SUB_PATTERN, 'mathSub')
+      : NEVER_MATCH,
   }
 }
 
