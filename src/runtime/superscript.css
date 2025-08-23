@@ -2,30 +2,59 @@
 /* SmartScript (ss-) prefixed classes for automatic typography */
 
 /* ============================================
+   CSS Variables (Custom Properties)
+   Allows runtime and CSS-based customization
+   ============================================ */
+:root {
+  /* Core superscript variables */
+  --ss-sup-font-size: 0.75em;
+  --ss-sup-vertical-align: super;
+  --ss-sup-line-height: 0;
+  --ss-sup-top: 0.15em;
+  --ss-sup-margin-left: 0.05em;
+  --ss-sup-margin-right: 0.1em;
+  --ss-sup-letter-spacing: 0.025em;
+  
+  /* Core subscript variables */
+  --ss-sub-font-size: 0.75em;
+  --ss-sub-vertical-align: sub;
+  --ss-sub-line-height: 0;
+  --ss-sub-margin-left: 0.05em;
+  --ss-sub-margin-right: 0.1em;
+  --ss-sub-letter-spacing: 0.025em;
+  
+  /* Heading adjustments */
+  --ss-heading-font-size: 0.65em;
+  
+  /* Media query adjustments */
+  --ss-print-font-size: 0.7em;
+}
+
+/* ============================================
    Core Superscript Styling
    Best practice: Use vertical-align: super with line-height: 0
    ============================================ */
 sup.ss-sup {
   /* Size reduction */
-  font-size: 0.75em;
+  font-size: var(--ss-sup-font-size);
   
   /* Use browser's native superscript positioning */
-  vertical-align: super;
+  vertical-align: var(--ss-sup-vertical-align);
   
   /* Prevent line-height disruption */
-  line-height: 0;
+  line-height: var(--ss-sup-line-height);
   
   /* Fine-tune position - bring down slightly from browser default */
   position: relative;
-  top: 0.15em;  /* Scales with font size */
+  top: var(--ss-sup-top);  /* Scales with font size */
   
   /* Spacing */
-  margin-left: 0.05em;
-  margin-right: 0.1em;
+  margin-left: var(--ss-sup-margin-left);
+  margin-right: var(--ss-sup-margin-right);
   
   /* Inherit parent styles */
   font-weight: inherit;
-  letter-spacing: 0.025em;
+  letter-spacing: var(--ss-sup-letter-spacing);
 }
 
 /* ============================================
@@ -33,21 +62,21 @@ sup.ss-sup {
    ============================================ */
 sub.ss-sub {
   /* Size reduction */
-  font-size: 0.75em;
+  font-size: var(--ss-sub-font-size);
   
   /* Use browser's native subscript positioning */
-  vertical-align: sub;
+  vertical-align: var(--ss-sub-vertical-align);
   
   /* Prevent line-height disruption */
-  line-height: 0;
+  line-height: var(--ss-sub-line-height);
   
   /* Spacing */
-  margin-left: 0.05em;
-  margin-right: 0.1em;
+  margin-left: var(--ss-sub-margin-left);
+  margin-right: var(--ss-sub-margin-right);
   
   /* Inherit parent styles */
   font-weight: inherit;
-  letter-spacing: 0.025em;
+  letter-spacing: var(--ss-sub-letter-spacing);
 }
 
 /* ============================================
@@ -55,7 +84,7 @@ sub.ss-sub {
    ============================================ */
 :is(h1, h2, h3, h4, h5, h6) sup.ss-sup,
 :is(h1, h2, h3, h4, h5, h6) sub.ss-sub {
-  font-size: 0.65em;
+  font-size: var(--ss-heading-font-size);
 }
 
 /* ============================================
@@ -84,7 +113,7 @@ sup.ss-reg {
 @media print {
   sup.ss-sup, 
   sub.ss-sub {
-    font-size: 0.7em;
+    font-size: var(--ss-print-font-size);
   }
 }
 

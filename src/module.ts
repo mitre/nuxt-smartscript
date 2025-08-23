@@ -47,6 +47,51 @@ export interface ModuleOptions {
     batchSize?: number
     delay?: number
   }
+
+  /**
+   * Enable/disable specific transformations
+   * Set to false to disable specific transformation types
+   */
+  transformations?: {
+    trademark?: boolean // Transform (TM) and ™ - Default: true
+    registered?: boolean // Transform (R) and ® - Default: true
+    copyright?: boolean // Transform (C) and © - Default: true
+    ordinals?: boolean // Transform 1st, 2nd, etc. - Default: true
+    chemicals?: boolean // Transform H2O, CO2, etc. - Default: true
+    mathSuper?: boolean // Transform x^2, E=mc^2 - Default: true
+    mathSub?: boolean // Transform x_1, x_n - Default: true
+  }
+
+  /**
+   * Custom pattern overrides for advanced users
+   * WARNING: Use with caution - invalid regex can break the plugin
+   * Patterns should be provided as strings (will be compiled with 'g' flag)
+   */
+  customPatterns?: {
+    trademark?: string // Override trademark pattern
+    registered?: string // Override registered pattern
+    copyright?: string // Override copyright pattern
+    ordinals?: string // Override ordinals pattern
+    chemicals?: string // Override chemicals pattern
+    mathSuper?: string // Override math superscript pattern
+    mathSub?: string // Override math subscript pattern
+  }
+
+  /**
+   * CSS Variables configuration
+   * Allows runtime customization of CSS values via custom properties
+   * These values override the default CSS variables defined in the stylesheet
+   * Example: { 'sup-font-size': '0.8em', 'sup-top': '0.2em' }
+   */
+  cssVariables?: Record<string, string>
+
+  /**
+   * Enable static site processing
+   * When true, processes content during build/generation for SSG sites
+   * This ensures transformed content is in the HTML (better SEO, no FOUC)
+   * @default false
+   */
+  processStatic?: boolean
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -106,6 +151,16 @@ export default defineNuxtModule<ModuleOptions>({
       batchSize: 50,
       delay: 1500,
     },
+    transformations: {
+      trademark: true,
+      registered: true,
+      copyright: true,
+      ordinals: true,
+      chemicals: true,
+      mathSuper: true,
+      mathSub: true,
+    },
+    processStatic: false,
   },
 
   setup(options, nuxt) {

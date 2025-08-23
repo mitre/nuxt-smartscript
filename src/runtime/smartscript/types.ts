@@ -37,6 +37,25 @@ export interface SuperscriptConfig {
       fontSize?: string
     }
   }
+  transformations?: {
+    trademark?: boolean
+    registered?: boolean
+    copyright?: boolean
+    ordinals?: boolean
+    chemicals?: boolean
+    mathSuper?: boolean
+    mathSub?: boolean
+  }
+  customPatterns?: {
+    trademark?: string
+    registered?: string
+    copyright?: string
+    ordinals?: string
+    chemicals?: string
+    mathSuper?: string
+    mathSub?: string
+  }
+  cssVariables?: Record<string, string>
 }
 
 export interface TextPart {

@@ -101,6 +101,17 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // Initialize on app mount
   nuxtApp.hook('app:mounted', () => {
+    // Apply CSS variables if configured
+    if (config.cssVariables && typeof config.cssVariables === 'object') {
+      const root = document.documentElement
+      Object.entries(config.cssVariables).forEach(([key, value]) => {
+        // Ensure key starts with --ss- prefix
+        const varName = key.startsWith('--') ? key : `--ss-${key}`
+        root.style.setProperty(varName, value)
+        logger.debug('CSS variable set:', varName, '→', value)
+      })
+    }
+
     // Use requestIdleCallback for better performance
     const initialize = () => {
       process()
