@@ -2,7 +2,7 @@
 
 ## Overview
 
-The nuxt-smartscript module follows a modular, separation-of-concerns architecture designed for maintainability, testability, and extensibility. The codebase is organized into focused modules, each responsible for a specific aspect of the typography transformation system.
+The @mitre/@mitre/nuxt-smartscript module follows a modular, separation-of-concerns architecture designed for maintainability, testability, and extensibility. The codebase is organized into focused modules, each responsible for a specific aspect of the typography transformation system.
 
 ## Module Structure
 

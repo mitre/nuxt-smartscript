@@ -6,7 +6,7 @@ Configure the plugin in your `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['nuxt-smartscript'],
+  modules: ['@mitre/nuxt-smartscript'],
   
   smartscript: {
     // Enable/disable the plugin
@@ -272,7 +272,7 @@ sub.my-sub {
 ### Accessing CSS Classes in Code
 
 ```typescript
-import { CSS_CLASSES } from 'nuxt-smartscript'
+import { CSS_CLASSES } from '@mitre/nuxt-smartscript'
 
 // These will reflect your custom classes if configured
 console.log(CSS_CLASSES.superscript)  // 'my-sup' (or 'ss-sup' if not customized)

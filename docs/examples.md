@@ -122,7 +122,7 @@ sup.ss-sup.ss-reg {
 
 ```typescript
 // composables/useCustomStyles.ts
-import { CSS_CLASSES } from 'nuxt-smartscript'
+import { CSS_CLASSES } from '@mitre/@mitre/nuxt-smartscript'
 
 export function useCustomStyles() {
   // Add custom handling for specific elements

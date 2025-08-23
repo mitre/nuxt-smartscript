@@ -1,10 +1,10 @@
 # Vue Integration
 
-This guide shows how to integrate nuxt-smartscript with your Vue components using the provided composable and API.
+This guide shows how to integrate @mitre/@mitre/nuxt-smartscript with your Vue components using the provided composable and API.
 
 ## Auto-Processing
 
-By default, nuxt-smartscript automatically processes your content without any component integration needed. The module will:
+By default, @mitre/@mitre/nuxt-smartscript automatically processes your content without any component integration needed. The module will:
 
 - Process content after app mount
 - Watch for DOM changes

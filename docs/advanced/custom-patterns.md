@@ -276,7 +276,7 @@ export function createPatterns(config: SuperscriptConfig): PatternSet {
 ```typescript
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ['nuxt-smartscript'],
+  modules: ['@mitre/nuxt-smartscript'],
   
   smartscript: {
     symbols: {

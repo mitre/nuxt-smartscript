@@ -1,6 +1,6 @@
 # Development Workflow
 
-This guide explains the day-to-day development workflow for working on nuxt-smartscript.
+This guide explains the day-to-day development workflow for working on @mitre/nuxt-smartscript.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ This guide explains the day-to-day development workflow for working on nuxt-smar
 ```bash
 # Clone the repository
 git clone https://github.com/mitre/nuxt-smartscript.git
-cd nuxt-smartscript
+cd @mitre/nuxt-smartscript
 
 # Install dependencies
 pnpm install
@@ -138,7 +138,7 @@ pnpm test -- --run --no-parallel
 ## Project Structure
 
 ```
-nuxt-smartscript/
+@mitre/nuxt-smartscript/
 ├── src/
 │   ├── module.ts                 # Main module entry (rebuild needed)
 │   └── runtime/
@@ -174,5 +174,5 @@ nuxt-smartscript/
 ## Getting Help
 
 - Check existing issues: https://github.com/mitre/nuxt-smartscript/issues
-- Read the docs: https://mitre.github.io/nuxt-smartscript
+- Read the docs: https://mitre.github.io/@mitre/nuxt-smartscript
 - Ask in discussions: https://github.com/mitre/nuxt-smartscript/discussions

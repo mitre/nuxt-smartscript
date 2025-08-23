@@ -28,20 +28,20 @@ Install the module:
 
 ```bash
 # npm
-npm install nuxt-smartscript
+npm install @mitre/nuxt-smartscript
 
 # pnpm
-pnpm add nuxt-smartscript
+pnpm add @mitre/nuxt-smartscript
 
 # yarn
-yarn add nuxt-smartscript
+yarn add @mitre/nuxt-smartscript
 ```
 
 Add to your `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['nuxt-smartscript']
+  modules: ['@mitre/nuxt-smartscript']
 })
 ```
 
@@ -73,7 +73,7 @@ Customize the behavior in `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['nuxt-smartscript'],
+  modules: ['@mitre/nuxt-smartscript'],
   
   smartscript: {
     // Customize positioning for your font
@@ -146,14 +146,14 @@ pnpm lint
 [Apache-2.0](./LICENSE.md) - MITRE Corporation
 
 <!-- Badges -->
-[npm-version-src]: https://img.shields.io/npm/v/nuxt-smartscript/latest.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-version-href]: https://npmjs.com/package/nuxt-smartscript
+[npm-version-src]: https://img.shields.io/npm/v/@mitre/nuxt-smartscript/latest.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-version-href]: https://npmjs.com/package/@mitre/nuxt-smartscript
 
-[npm-downloads-src]: https://img.shields.io/npm/dm/nuxt-smartscript.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-downloads-href]: https://npm.chart.dev/nuxt-smartscript
+[npm-downloads-src]: https://img.shields.io/npm/dm/@mitre/nuxt-smartscript.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-downloads-href]: https://npm.chart.dev/@mitre/nuxt-smartscript
 
-[license-src]: https://img.shields.io/npm/l/nuxt-smartscript.svg?style=flat&colorA=020420&colorB=00DC82
-[license-href]: https://npmjs.com/package/nuxt-smartscript
+[license-src]: https://img.shields.io/npm/l/@mitre/nuxt-smartscript.svg?style=flat&colorA=020420&colorB=00DC82
+[license-href]: https://npmjs.com/package/@mitre/nuxt-smartscript
 
 [nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt.js
 [nuxt-href]: https://nuxt.com

@@ -11,7 +11,7 @@ hero:
       link: /quick-start
     - theme: alt
       text: View on GitHub
-      link: https://github.com/mitre/nuxt-smartscript
+      link: https://github.com/mitre/@mitre/@mitre/nuxt-smartscript
 
 features:
   - icon: 🔤
@@ -67,14 +67,14 @@ E=mc^2 is Einstein's famous equation.
 Install the module to your Nuxt application with one command:
 
 ```bash
-npm install nuxt-smartscript
+npm install @mitre/@mitre/nuxt-smartscript
 ```
 
 Add it to your `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['nuxt-smartscript']
+  modules: ['@mitre/@mitre/nuxt-smartscript']
 })
 ```
 

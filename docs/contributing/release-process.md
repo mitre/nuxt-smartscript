@@ -1,6 +1,6 @@
 # Release Process
 
-This document describes the release process for nuxt-smartscript.
+This document describes the release process for @mitre/nuxt-smartscript.
 
 ## Two Release Paths
 
@@ -92,7 +92,7 @@ This document describes the release process for nuxt-smartscript.
 Before releasing:
 1. Ensure you have push access to the repository
 2. Ensure you have npm publish rights for the package
-3. `SAF_NPM_TOKEN` must be set as a GitHub secret for automated publishing
+3. `NPM_TOKEN` must be set as a GitHub secret for automated publishing
 4. You must be on the main branch with a clean working tree
 
 ## How Direct Release Works
@@ -203,9 +203,9 @@ pnpm release
 
 ## Post-Release Checklist
 
-- [ ] Verify npm package: https://www.npmjs.com/package/nuxt-smartscript
+- [ ] Verify npm package: https://www.npmjs.com/package/@mitre/nuxt-smartscript
 - [ ] Check GitHub release: https://github.com/mitre/nuxt-smartscript/releases
-- [ ] Test installation: `npm create nuxt-app test-app && cd test-app && npm i nuxt-smartscript`
+- [ ] Test installation: `npm create nuxt-app test-app && cd test-app && npm i @mitre/nuxt-smartscript`
 
 ## Troubleshooting
 
@@ -226,7 +226,7 @@ pnpm lint
 ### GitHub Actions fails
 
 1. Check Actions tab: https://github.com/mitre/nuxt-smartscript/actions
-2. Verify `SAF_NPM_TOKEN` is set in repository secrets
+2. Verify `NPM_TOKEN` is set in repository secrets
 3. Check npm publish permissions
 
 ## For Contributors (PR-Based Workflow)

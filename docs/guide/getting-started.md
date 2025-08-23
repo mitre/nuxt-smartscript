@@ -14,20 +14,20 @@ Before you begin, make sure you have:
 
 ### Step 1: Install the Package
 
-Add nuxt-smartscript to your project:
+Add @mitre/nuxt-smartscript to your project:
 
 ::: code-group
 
 ```bash [npm]
-npm install nuxt-smartscript
+npm install @mitre/nuxt-smartscript
 ```
 
 ```bash [pnpm]
-pnpm add nuxt-smartscript
+pnpm add @mitre/nuxt-smartscript
 ```
 
 ```bash [yarn]
-yarn add nuxt-smartscript
+yarn add @mitre/nuxt-smartscript
 ```
 
 :::
@@ -39,7 +39,7 @@ Add the module to your `nuxt.config.ts`:
 ```typescript
 export default defineNuxtConfig({
   modules: [
-    'nuxt-smartscript'
+    '@mitre/nuxt-smartscript'
   ]
 })
 ```
@@ -168,7 +168,7 @@ You can customize SmartScript behavior in `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['nuxt-smartscript'],
+  modules: ['@mitre/nuxt-smartscript'],
   
   smartscript: {
     // Disable specific transformations
