@@ -68,6 +68,7 @@ recovery-prompt*.md
 test-*.js
 test-*.txt
 session.md
+CLAUDE.md
 
 # Project-specific
 *.old.ts
