@@ -146,6 +146,8 @@ pnpm prepack
 pnpm lint
 ```
 
+**For Contributors**: This module uses a two-type system (ModuleOptions for users, SuperscriptConfig for runtime) to handle Nuxt's configuration transformation. See [Contributing Guide](./docs/contributing.md) and [TypeScript Architecture](./docs/contributing/typescript-architecture.md) for details.
+
 ## License
 
 [Apache-2.0](./LICENSE.md) - MITRE Corporation

@@ -220,6 +220,15 @@ export default defineNuxtConfig({
 - **Performance**: Slightly slower than regex (worth it for accuracy)
 - **Complexity**: More setup code for SSR
 
+## TypeScript Architecture
+
+The module uses a **two-type system** to handle the boundary between Nuxt's module configuration and runtime processing:
+
+1. **ModuleOptions** - What users configure (all properties optional)
+2. **SuperscriptConfig** - What runtime uses (all properties required)
+
+This design provides the best developer experience while maintaining type safety. For details, see [TypeScript Architecture](./contributing/typescript-architecture.md).
+
 ## Future Enhancements
 
 Potential improvements while maintaining architecture:

@@ -143,6 +143,7 @@ Before/after screenshots for visual changes
 - Keep functions small and focused
 - Add JSDoc comments for public APIs
 - Use descriptive variable names
+- Understand the [TypeScript Architecture](./contributing/typescript-architecture.md) for config types
 
 ## 🐛 Bug Reports
 
