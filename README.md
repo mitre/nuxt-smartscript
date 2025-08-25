@@ -150,7 +150,7 @@ pnpm lint
 
 ## License
 
-[Apache-2.0](./LICENSE.md) - MITRE Corporation
+[Apache-2.0](./LICENSE) - MITRE Corporation
 
 <!-- Badges -->
 [npm-version-src]: https://img.shields.io/npm/v/@mitre/nuxt-smartscript/latest.svg?style=flat&colorA=020420&colorB=00DC82

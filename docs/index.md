@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Nuxt SmartScript
   text: Automatic Typography Transformations
-  tagline: Smart, accessible typography enhancements for your Nuxt applications
+  tagline: Smart, accessible typography enhancements for your Nuxt applications with full SSR/SSG support
   actions:
     - theme: brand
       text: Get Started
@@ -26,20 +26,37 @@ features:
   - icon: 📐
     title: Math Notation
     details: Supports x^2 superscripts and x_1 subscripts for mathematical expressions
-  - icon: ⚡
-    title: Performance First
-    details: Optimized with debouncing, batching, and lazy loading for smooth user experience
-  - icon: ♿
-    title: Fully Accessible
-    details: ARIA labels and semantic HTML ensure screen reader compatibility
   - icon: 🚀
-    title: SSR/SSG Support
-    details: Server-side rendering and static generation for SEO-friendly content (v0.4.0)
+    title: Full SSR/SSG Support
+    details: Works seamlessly with server-side rendering and static generation for optimal SEO
+  - icon: 🎯
+    title: Smart Selectors
+    details: Process 30+ HTML elements including headings, paragraphs, lists, tables, and more
+  - icon: ⚡
+    title: Performance Optimized
+    details: Debouncing, batching, and caching for smooth performance even with large documents
+  - icon: ♿
+    title: Accessibility First
+    details: ARIA labels and semantic HTML ensure full screen reader compatibility
 ---
 
 ## What is Nuxt SmartScript?
 
+<p>
+  <a href="https://www.npmjs.com/package/@mitre/nuxt-smartscript"><img src="https://img.shields.io/npm/v/@mitre/nuxt-smartscript?style=flat&colorA=18181B&colorB=28CF8D" alt="Version"></a>&nbsp;
+  <a href="https://www.npmjs.com/package/@mitre/nuxt-smartscript"><img src="https://img.shields.io/npm/dm/@mitre/nuxt-smartscript?style=flat&colorA=18181B&colorB=28CF8D" alt="Downloads"></a>&nbsp;
+  <a href="https://github.com/mitre/nuxt-smartscript/blob/main/LICENSE"><img src="https://img.shields.io/github/license/mitre/nuxt-smartscript?style=flat&colorA=18181B&colorB=28CF8D" alt="License"></a>
+</p>
+
 Nuxt SmartScript is a powerful Nuxt module that automatically transforms typography patterns in your content to enhance readability and visual appeal. It works seamlessly with your existing Nuxt application, requiring minimal configuration.
+
+## 🎉 What's New in v0.4.0
+
+- **Full SSR/SSG Support** - Server-side rendering and static generation now work perfectly
+- **30+ Element Support** - Process headings, paragraphs, lists, tables, spans, links, and more
+- **Improved Performance** - Better caching and pattern matching
+- **Bug Fixes** - Fixed navigation issues and configuration handling
+- **Better TypeScript** - Improved type definitions and module builder integration
 
 ## Why SmartScript?
 
@@ -65,23 +82,57 @@ E=mc^2 is Einstein's famous equation.
 - H<sub>2</sub>O and CO<sub>2</sub> are common molecules.
 - E=mc<sup>2</sup> is Einstein's famous equation.
 
+## Perfect For
+
+- 📚 **Documentation Sites** - Technical docs with formulas and trademark symbols
+- 🏢 **Corporate Websites** - Professional typography for brand names and legal marks
+- 🔬 **Scientific Content** - Chemical formulas and mathematical expressions
+- 📰 **Publishing Platforms** - Articles with ordinal numbers and special symbols
+- 📖 **Educational Materials** - Math and science content with proper notation
+
 ## Installation
 
 Install the module to your Nuxt application with one command:
 
-```bash
+::: code-group
+```bash [npm]
 npm install @mitre/nuxt-smartscript
 ```
+```bash [pnpm]
+pnpm add @mitre/nuxt-smartscript
+```
+```bash [yarn]
+yarn add @mitre/nuxt-smartscript
+```
+:::
 
 Add it to your `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['@mitre/nuxt-smartscript']
+  modules: ['@mitre/nuxt-smartscript'],
+  
+  // Optional: customize the behavior
+  smartscript: {
+    // Enable/disable specific transformations
+    transformations: {
+      trademark: true,    // (TM) → ™
+      registered: true,   // (R) → ®
+      copyright: true,    // (C) → ©
+      ordinals: true,     // 1st → 1ˢᵗ
+      chemicals: true,    // H2O → H₂O
+      mathSuper: true,    // x^2 → x²
+      mathSub: true,      // x_1 → x₁
+    },
+    
+    // Full SSR/SSG support
+    ssr: true,
+    client: true,
+  }
 })
 ```
 
-That's it! SmartScript will automatically enhance your typography.
+That's it! SmartScript will automatically enhance your typography across 30+ HTML elements.
 
 ## License
 
