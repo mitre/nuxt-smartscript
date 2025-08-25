@@ -3,20 +3,20 @@
  * Tests caching, batching, and performance features
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
 import { JSDOM } from 'jsdom'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
-  processText,
   clearProcessingCaches,
-  needsProcessing,
-  PatternMatchers,
-  PatternExtractors,
-  createPatterns,
   createCombinedPattern,
+  createPatterns,
   DEFAULT_CONFIG,
+  needsProcessing,
+  PatternExtractors,
+  PatternMatchers,
+  processText,
 } from '../../src/runtime/smartscript'
 
-describe('Performance: Caching', () => {
+describe('performance: Caching', () => {
   const config = DEFAULT_CONFIG
   const patterns = createPatterns(config)
   const combinedPattern = createCombinedPattern(patterns, config)
@@ -74,7 +74,7 @@ describe('Performance: Caching', () => {
   })
 })
 
-describe('Performance: Pattern Optimization', () => {
+describe('performance: Pattern Optimization', () => {
   it('should use pre-compiled regex patterns', () => {
     // Test that patterns are not recreated on each call
     const text1 = '™'
@@ -115,7 +115,7 @@ describe('Performance: Pattern Optimization', () => {
   })
 })
 
-describe('Performance: Batch Processing', () => {
+describe('performance: Batch Processing', () => {
   it('should handle empty text efficiently', () => {
     const pattern = /test/g
 
@@ -143,14 +143,14 @@ describe('Performance: Batch Processing', () => {
     expect(result.length).toBeGreaterThan(10)
 
     // Verify some specific transformations
-    const textContent = result.map(p => p.content).join('')
+    const textContent = result.map((p) => p.content).join('')
     expect(textContent).toContain('©') // (C) -> ©
-    expect(result.some(p => p.type === 'super')).toBe(true)
-    expect(result.some(p => p.type === 'sub')).toBe(true)
+    expect(result.some((p) => p.type === 'super')).toBe(true)
+    expect(result.some((p) => p.type === 'sub')).toBe(true)
   })
 })
 
-describe('Performance: Memory Management', () => {
+describe('performance: Memory Management', () => {
   it('should clear all caches on navigation', () => {
     const config = DEFAULT_CONFIG
     const patterns = createPatterns(config)
@@ -169,7 +169,7 @@ describe('Performance: Memory Management', () => {
   })
 })
 
-describe('Performance: Edge Cases', () => {
+describe('performance: Edge Cases', () => {
   it('should handle malformed patterns gracefully', () => {
     const config = DEFAULT_CONFIG
     const patterns = createPatterns(config)
@@ -188,7 +188,7 @@ describe('Performance: Edge Cases', () => {
     const combinedPattern = createCombinedPattern(patterns, config)
 
     // Generate a long text with patterns
-    const longText = Array(100).fill('test^2 and H_2O').join(' ')
+    const longText = Array.from({ length: 100 }).fill('test^2 and H_2O').join(' ')
 
     const startTime = performance.now()
     const result = processText(longText, combinedPattern)
@@ -201,7 +201,7 @@ describe('Performance: Edge Cases', () => {
 
   it('should handle very long strings', () => {
     const pattern = /\(TM\)/g
-    const longText = 'Start ' + 'x'.repeat(10000) + ' Product(TM) ' + 'y'.repeat(10000) + ' End'
+    const longText = `Start ${'x'.repeat(10000)} Product(TM) ${'y'.repeat(10000)} End`
     expect(longText.match(pattern)).toEqual(['(TM)'])
   })
 

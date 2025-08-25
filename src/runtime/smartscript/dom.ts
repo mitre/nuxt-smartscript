@@ -3,8 +3,8 @@
  */
 
 import type { TextPart } from './types'
-import { logger } from './logger'
 import { CSS_CLASSES } from './config'
+import { logger } from './logger'
 
 // Pre-compiled regex patterns for performance
 const DIGITS_ONLY = /^\d+$/
@@ -17,7 +17,11 @@ export function createSuperscriptElement(
   content: string,
   type: 'trademark' | 'registered' | 'ordinal' | 'math' | 'generic',
 ): HTMLElement {
-  const sup = document.createElement('sup')
+  // Use SPAN only for TM/R symbols that need precise positioning
+  // Keep SUP for math/ordinals for semantic correctness
+  const sup = document.createElement(
+    (type === 'trademark' || type === 'registered') ? 'span' : 'sup',
+  )
   sup.textContent = content
 
   switch (type) {
@@ -52,6 +56,7 @@ export function createSubscriptElement(
   content: string,
   type: 'chemical' | 'math' | 'generic',
 ): HTMLElement {
+  // Use semantic SUB for subscripts - they don't need positioning adjustments
   const sub = document.createElement('sub')
   sub.textContent = content
   sub.className = CSS_CLASSES.subscript
@@ -61,8 +66,7 @@ export function createSubscriptElement(
       // For chemical formulas, just the number is clearer
       if (DIGITS_ONLY.test(content)) {
         sub.setAttribute('aria-label', content)
-      }
-      else {
+      } else {
         sub.setAttribute('aria-label', `subscript ${content}`)
       }
       break
@@ -87,31 +91,35 @@ export function createFragmentFromParts(parts: TextPart[]): DocumentFragment {
     if (part.type === 'super') {
       let element: HTMLElement
 
-      // Determine the type of superscript
-      if (part.content === '™') {
-        element = createSuperscriptElement(part.content, 'trademark')
-      }
-      else if (part.content === '®') {
-        element = createSuperscriptElement(part.content, 'registered')
-      }
-      else if (ORDINAL_SUFFIX.test(part.content)) {
-        element = createSuperscriptElement(part.content, 'ordinal')
-      }
-      else {
-        element = createSuperscriptElement(part.content, 'generic')
+      // Use subtype if provided, otherwise fallback to content-based detection
+      if (part.subtype && part.subtype !== 'chemical') {
+        element = createSuperscriptElement(part.content, part.subtype as 'trademark' | 'registered' | 'ordinal' | 'math' | 'generic')
+      } else {
+        // Fallback for backward compatibility
+        if (part.content === '™') {
+          element = createSuperscriptElement(part.content, 'trademark')
+        } else if (part.content === '®') {
+          element = createSuperscriptElement(part.content, 'registered')
+        } else if (ORDINAL_SUFFIX.test(part.content)) {
+          element = createSuperscriptElement(part.content, 'ordinal')
+        } else {
+          element = createSuperscriptElement(part.content, 'generic')
+        }
       }
 
       fragment.appendChild(element)
-    }
-    else if (part.type === 'sub') {
-      const isChemical = DIGITS_ONLY.test(part.content)
-      const element = createSubscriptElement(
-        part.content,
-        isChemical ? 'chemical' : 'generic',
-      )
+    } else if (part.type === 'sub') {
+      // Use subtype if provided, otherwise detect based on content
+      const subtype = part.subtype === 'math'
+        ? 'math'
+        : part.subtype === 'chemical'
+          ? 'chemical'
+          : DIGITS_ONLY.test(part.content)
+            ? 'chemical'
+            : 'generic'
+      const element = createSubscriptElement(part.content, subtype)
       fragment.appendChild(element)
-    }
-    else {
+    } else {
       fragment.appendChild(document.createTextNode(part.content))
     }
   })
@@ -128,9 +136,9 @@ export function shouldExcludeElement(
 ): boolean {
   return excludeSelectors.some((selector) => {
     try {
-      return element.matches(selector)
-    }
-    catch (error) {
+      // Check if the element itself matches OR any ancestor matches
+      return element.matches(selector) || element.closest(selector) !== null
+    } catch (error) {
       logger.warn('Invalid exclude selector:', selector, error)
       return false
     }
@@ -147,8 +155,7 @@ export function shouldIncludeElement(
   return includeSelectors.some((selector) => {
     try {
       return element.matches(selector)
-    }
-    catch {
+    } catch {
       return false
     }
   })

@@ -3,19 +3,19 @@
  * Automatic typography transformations for better readability
  */
 
-import { defineNuxtPlugin } from '#app'
 import type { SuperscriptConfig } from './smartscript'
+import { defineNuxtPlugin } from '#app'
 import {
-  DEFAULT_CONFIG,
-  mergeConfig,
-  validateConfig,
-  createPatterns,
   createCombinedPattern,
-  processContent,
-  initializeForNavigation,
   createContentObserver,
+  createPatterns,
+  DEFAULT_CONFIG,
+  initializeForNavigation,
+  mergeConfig,
+  processContent,
+  validateConfig,
 } from './smartscript'
-import { logger, configureLogger } from './smartscript/logger'
+import { configureLogger, logger } from './smartscript/logger'
 
 // Plugin error class for better error handling
 class SmartScriptError extends Error {
@@ -36,6 +36,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     // Configure logger based on debug setting
     configureLogger(config.debug)
+
+    logger.debug('Runtime config received:', runtimeConfig)
+    logger.debug('Merged config:', config)
     logger.info('Plugin initializing...')
 
     // Validate configuration
@@ -46,17 +49,16 @@ export default defineNuxtPlugin((nuxtApp) => {
         'CONFIG_INVALID',
       )
     }
-  }
-  catch (error) {
+  } catch (error) {
     logger.error('Configuration error:', error)
     // Fall back to default config on error
     config = DEFAULT_CONFIG
     configureLogger(config.debug)
   }
 
-  // Create patterns
-  const patterns = createPatterns(config)
-  const combinedPattern = createCombinedPattern(patterns, config)
+  // Create patterns (using let so they can be reassigned)
+  let patterns = createPatterns(config)
+  let combinedPattern = createCombinedPattern(patterns, config)
 
   logger.debug('Patterns created:', {
     copyright: patterns.copyright,
@@ -64,12 +66,26 @@ export default defineNuxtPlugin((nuxtApp) => {
     combinedPattern,
   })
 
+  // Check if content was already processed server-side
+  const isServerProcessed = () => {
+    const metaTag = document.querySelector('meta[name="smartscript-processed"]')
+    if (metaTag) {
+      logger.info('Found server-processed marker')
+    }
+    return metaTag !== null
+  }
+
   // Main processing function
   const process = () => {
     try {
+      // Skip if already processed server-side UNLESS client is explicitly enabled
+      // When both ssr and client are true, we process on both sides (for dynamic content)
+      if (isServerProcessed() && config.ssr === true && config.client === false) {
+        logger.info('Content already processed server-side, skipping client processing')
+        return
+      }
       processContent(config, patterns, combinedPattern)
-    }
-    catch (error) {
+    } catch (error) {
       logger.error('Processing error:', error)
     }
   }
@@ -78,7 +94,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   let observer: MutationObserver | null = null
 
   const startObserving = () => {
-    if (observer) return
+    if (observer)
+      return
 
     try {
       observer = createContentObserver(process, config)
@@ -86,8 +103,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         childList: true,
         subtree: true,
       })
-    }
-    catch (error) {
+    } catch (error) {
       logger.error('Observer error:', error)
     }
   }
@@ -101,15 +117,22 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // Initialize on app mount
   nuxtApp.hook('app:mounted', () => {
+    logger.debug('app:mounted hook fired')
+    logger.debug('config.cssVariables:', config.cssVariables)
+
     // Apply CSS variables if configured
     if (config.cssVariables && typeof config.cssVariables === 'object') {
       const root = document.documentElement
+      logger.debug('Applying CSS variables...')
       Object.entries(config.cssVariables).forEach(([key, value]) => {
         // Ensure key starts with --ss- prefix
         const varName = key.startsWith('--') ? key : `--ss-${key}`
         root.style.setProperty(varName, value)
         logger.debug('CSS variable set:', varName, '→', value)
       })
+      logger.debug('CSS variables applied!')
+    } else {
+      logger.debug('No CSS variables to apply')
     }
 
     // Use requestIdleCallback for better performance
@@ -125,8 +148,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
         { timeout: config.performance.delay },
       )
-    }
-    else {
+    } else {
       setTimeout(initialize, config.performance.delay)
     }
   })
@@ -181,21 +203,18 @@ export default defineNuxtPlugin((nuxtApp) => {
             }
 
             // Recreate patterns with new config
-            const newPatterns = createPatterns(config)
-            const newCombinedPattern = createCombinedPattern(newPatterns, config)
+            patterns = createPatterns(config)
+            combinedPattern = createCombinedPattern(patterns, config)
 
-            // Update closures
-            Object.assign(patterns, newPatterns)
-            combinedPattern.source = newCombinedPattern.source
-            combinedPattern.flags = newCombinedPattern.flags
+            // Configure logger with new debug setting
+            configureLogger(config.debug)
 
             // Reprocess content
             initializeForNavigation()
             process()
 
             return true
-          }
-          catch (error) {
+          } catch (error) {
             logger.error('Configuration update error:', error)
             return false
           }
@@ -211,13 +230,17 @@ export default defineNuxtPlugin((nuxtApp) => {
         // Get processing statistics
         getStats: () => {
           const processed = document.querySelectorAll('[data-superscript-processed]').length
-          const superscripts = document.querySelectorAll('.auto-super').length
-          const subscripts = document.querySelectorAll('.auto-sub').length
+          const superscripts = document.querySelectorAll('.ss-sup, .ss-tm, .ss-reg').length
+          const subscripts = document.querySelectorAll('.ss-sub').length
+          const trademarks = document.querySelectorAll('.ss-tm').length
+          const registered = document.querySelectorAll('.ss-reg').length
 
           return {
             processedElements: processed,
             superscripts,
             subscripts,
+            trademarks,
+            registered,
             total: superscripts + subscripts,
           }
         },

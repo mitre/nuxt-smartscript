@@ -2,9 +2,9 @@
  * Vue composable for SmartScript
  */
 
-import { ref, onMounted } from 'vue'
-import { useNuxtApp } from '#app'
 import type { SuperscriptConfig } from '../smartscript/types'
+import { useNuxtApp } from '#app'
+import { onMounted, ref } from 'vue'
 
 export interface SmartScriptApi {
   process: () => void
@@ -37,27 +37,28 @@ export function useSmartScript() {
   })
 
   /**
+   * Update statistics
+   */
+  const updateStats = () => {
+    if (!smartscript)
+      return
+    stats.value = smartscript.getStats()
+  }
+
+  /**
    * Process content in the current component
    */
   const process = async () => {
-    if (!smartscript || isProcessing.value) return
+    if (!smartscript || isProcessing.value)
+      return
 
     isProcessing.value = true
     try {
       await smartscript.process()
       updateStats()
-    }
-    finally {
+    } finally {
       isProcessing.value = false
     }
-  }
-
-  /**
-   * Update statistics
-   */
-  const updateStats = () => {
-    if (!smartscript) return
-    stats.value = smartscript.getStats()
   }
 
   /**
@@ -83,8 +84,7 @@ export function useSmartScript() {
   const toggleForElement = (element: HTMLElement) => {
     if (element.classList.contains('no-superscript')) {
       enableForElement(element)
-    }
-    else {
+    } else {
       disableForElement(element)
     }
   }

@@ -3,19 +3,19 @@
  * Tests the text processing and transformation logic
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  processMatch,
-  processText,
+  createCombinedPattern,
+  createPatterns,
+  DEFAULT_CONFIG,
   needsProcessing,
   PatternExtractors,
   PatternMatchers,
-  createPatterns,
-  createCombinedPattern,
-  DEFAULT_CONFIG,
+  processMatch,
+  processText,
 } from '../../src/runtime/smartscript'
 
-describe('Text Processing', () => {
+describe('text Processing', () => {
   const config = DEFAULT_CONFIG
   const patterns = createPatterns(config)
   const combinedPattern = createCombinedPattern(patterns, config)
@@ -25,15 +25,15 @@ describe('Text Processing', () => {
       const result = processMatch('(TM)')
       expect(result.modified).toBe(true)
       expect(result.parts).toEqual([
-        { type: 'super', content: '™' },
+        { type: 'super', content: '™', subtype: 'trademark' },
       ])
     })
 
-    it('should transform (R) to ® plain text', () => {
+    it('should transform (R) to ® superscript', () => {
       const result = processMatch('(R)')
       expect(result.modified).toBe(true)
       expect(result.parts).toEqual([
-        { type: 'text', content: '®' },
+        { type: 'super', content: '®', subtype: 'registered' },
       ])
     })
 
@@ -50,7 +50,7 @@ describe('Text Processing', () => {
       expect(result.modified).toBe(true)
       expect(result.parts).toEqual([
         { type: 'text', content: '1' },
-        { type: 'super', content: 'st' },
+        { type: 'super', content: 'st', subtype: 'ordinal' },
       ])
     })
 
@@ -59,7 +59,7 @@ describe('Text Processing', () => {
       expect(result.modified).toBe(true)
       expect(result.parts).toEqual([
         { type: 'text', content: 'H' },
-        { type: 'sub', content: '2' },
+        { type: 'sub', content: '2', subtype: 'chemical' },
       ])
     })
 
@@ -68,7 +68,7 @@ describe('Text Processing', () => {
       expect(result.modified).toBe(true)
       expect(result.parts).toEqual([
         { type: 'text', content: 'x' },
-        { type: 'super', content: '2' },
+        { type: 'super', content: '2', subtype: 'math' },
       ])
     })
 
@@ -77,7 +77,7 @@ describe('Text Processing', () => {
       expect(result.modified).toBe(true)
       expect(result.parts).toEqual([
         { type: 'text', content: 'x' },
-        { type: 'sub', content: '1' },
+        { type: 'sub', content: '1', subtype: 'math' },
       ])
     })
 
@@ -97,7 +97,7 @@ describe('Text Processing', () => {
 
       // Should have parts for "1", "st" (super), " place: E=m", "c", "2" (super)
       expect(parts.length).toBeGreaterThan(3)
-      expect(parts.some(p => p.type === 'super')).toBe(true)
+      expect(parts.some((p) => p.type === 'super')).toBe(true)
     })
 
     it('should handle text with no patterns', () => {
@@ -114,7 +114,7 @@ describe('Text Processing', () => {
       const parts = processText(text, combinedPattern)
 
       // Should have subscripts for chemical formulas
-      expect(parts.some(p => p.type === 'sub')).toBe(true)
+      expect(parts.some((p) => p.type === 'sub')).toBe(true)
     })
   })
 
@@ -141,7 +141,7 @@ describe('Text Processing', () => {
     })
   })
 
-  describe('Pattern Extractors', () => {
+  describe('pattern Extractors', () => {
     it('should extract ordinal parts', () => {
       expect(PatternExtractors.extractOrdinal('1st')).toEqual({
         number: '1',
@@ -195,7 +195,7 @@ describe('Text Processing', () => {
     })
   })
 
-  describe('Processing Function Edge Cases', () => {
+  describe('processing Function Edge Cases', () => {
     it('should handle processMatch with edge inputs', () => {
       // Very long input
       const longInput = 'TM'.repeat(1000)
@@ -222,7 +222,7 @@ describe('Text Processing', () => {
     })
   })
 
-  describe('Regex State Management', () => {
+  describe('regex State Management', () => {
     it('should handle regex with global flag correctly', () => {
       const pattern = /\(TM\)/g
       const text = 'Product(TM) Another(TM)'
@@ -262,7 +262,7 @@ describe('Text Processing', () => {
     })
   })
 
-  describe('Error Recovery Cases', () => {
+  describe('error Recovery Cases', () => {
     it('should handle null and undefined gracefully', () => {
       expect(PatternMatchers.isTrademark('')).toBe(false)
       expect(PatternExtractors.extractOrdinal('')).toBeNull()

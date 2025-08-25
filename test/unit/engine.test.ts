@@ -3,20 +3,20 @@
  * Tests for the core processing engine functions
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
 import { JSDOM } from 'jsdom'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
-  processTextNode,
-  processElement,
-  processContent,
-} from '../../src/runtime/smartscript/engine'
-import {
-  createPatterns,
   createCombinedPattern,
+  createPatterns,
   DEFAULT_CONFIG,
 } from '../../src/runtime/smartscript'
+import {
+  processContent,
+  processElement,
+  processTextNode,
+} from '../../src/runtime/smartscript/engine'
 
-describe('Engine: Core Processing Functions', () => {
+describe('engine: Core Processing Functions', () => {
   let dom: JSDOM
   let document: Document
   const config = DEFAULT_CONFIG
@@ -30,7 +30,7 @@ describe('Engine: Core Processing Functions', () => {
 
     // Add browser globals for JSDOM
     if (typeof NodeFilter === 'undefined') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line ts/no-explicit-any
       (global as any).NodeFilter = {
         FILTER_ACCEPT: 1,
         FILTER_REJECT: 2,
@@ -41,7 +41,7 @@ describe('Engine: Core Processing Functions', () => {
     }
 
     if (typeof HTMLElement === 'undefined') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line ts/no-explicit-any
       (global as any).HTMLElement = dom.window.HTMLElement
     }
   })
@@ -55,8 +55,8 @@ describe('Engine: Core Processing Functions', () => {
       const modified = processTextNode(textNode, config, combinedPattern)
 
       expect(modified).toBe(true)
-      // Node should be replaced with fragment containing sup element
-      expect(div.querySelector('sup')).toBeTruthy()
+      // Node should be replaced with fragment containing SPAN element (hybrid approach for TM)
+      expect(div.querySelector('span.ss-tm')).toBeTruthy()
       expect(div.textContent).toBe('Product™')
     })
 
@@ -208,9 +208,9 @@ describe('Engine: Core Processing Functions', () => {
 
       processContent(config, patterns, combinedPattern)
 
-      // Normal paragraph should be processed
+      // Normal paragraph should be processed (TM is now SPAN with hybrid approach)
       const p = document.querySelector('p')
-      expect(p?.querySelector('sup')).toBeTruthy()
+      expect(p?.querySelector('span.ss-tm')).toBeTruthy()
 
       // Pre should not be processed
       const pre = document.querySelector('pre')
@@ -250,9 +250,9 @@ describe('Engine: Core Processing Functions', () => {
       const p = document.querySelector('p')
       expect(p?.querySelector('sub')).toBeTruthy()
 
-      // Check nested em has trademark
+      // Check nested em has trademark (TM is now SPAN with hybrid approach)
       const em = document.querySelector('em')
-      expect(em?.querySelector('sup')).toBeTruthy()
+      expect(em?.querySelector('span.ss-tm')).toBeTruthy()
     })
 
     it('should handle empty container', () => {
@@ -278,7 +278,7 @@ describe('Engine: Core Processing Functions', () => {
     })
   })
 
-  describe('HTML Context Edge Cases', () => {
+  describe('hTML Context Edge Cases', () => {
     it('should handle text in different HTML contexts', () => {
       const contexts = [
         document.createElement('p'),

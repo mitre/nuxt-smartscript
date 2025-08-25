@@ -3,16 +3,16 @@
  * This was a critical bug where H1, H2, etc. were being treated as chemicals
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  PatternMatchers,
-  createPatterns,
   createCombinedPattern,
-  processText,
+  createPatterns,
   DEFAULT_CONFIG,
-} from '../../src/runtime/smartscript'
+  PatternMatchers,
+  processText,
+} from '../../../src/runtime/smartscript'
 
-describe('HTML Headers Bug Fix', () => {
+describe('hTML Headers Bug Fix', () => {
   const config = DEFAULT_CONFIG
   const patterns = createPatterns(config)
   const combinedPattern = createCombinedPattern(patterns, config)
@@ -76,11 +76,11 @@ describe('HTML Headers Bug Fix', () => {
     const result = processText(text, combinedPattern)
 
     // H1 should stay as text, Na2 should be transformed
-    const textContent = result.map(p => p.content).join('')
+    const textContent = result.map((p) => p.content).join('')
     expect(textContent).toBe(text) // Content preserved
 
     // Na2 should have been processed
-    const hasSubscript = result.some(p => p.type === 'sub' && p.content === '2')
+    const hasSubscript = result.some((p) => p.type === 'sub' && p.content === '2')
     expect(hasSubscript).toBe(true)
   })
 })

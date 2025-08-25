@@ -3,16 +3,16 @@
  * Tests text processing cache and memory management
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
-  processText,
   clearProcessingCaches,
-  createPatterns,
   createCombinedPattern,
+  createPatterns,
   DEFAULT_CONFIG,
+  processText,
 } from '../../src/runtime/smartscript'
 
-describe('Caching Performance', () => {
+describe('caching Performance', () => {
   const config = DEFAULT_CONFIG
   const patterns = createPatterns(config)
   const combinedPattern = createCombinedPattern(patterns, config)
@@ -22,7 +22,7 @@ describe('Caching Performance', () => {
     clearProcessingCaches()
   })
 
-  describe('Text Processing Cache', () => {
+  describe('text Processing Cache', () => {
     it('should cache repeated text processing', () => {
       const text = 'E=mc^2 and H_2O'
 
@@ -69,7 +69,7 @@ describe('Caching Performance', () => {
     })
   })
 
-  describe('Memory Management', () => {
+  describe('memory Management', () => {
     it('should clear all caches on navigation', () => {
       // Process some text
       processText('test^2', combinedPattern)
@@ -85,7 +85,7 @@ describe('Caching Performance', () => {
 
     it('should handle very long text efficiently', () => {
       // Generate a long text with patterns
-      const longText = Array(100).fill('test^2 and H_2O').join(' ')
+      const longText = Array.from({ length: 100 }).fill('test^2 and H_2O').join(' ')
 
       const startTime = performance.now()
       const result = processText(longText, combinedPattern)

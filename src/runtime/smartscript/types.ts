@@ -61,6 +61,7 @@ export interface SuperscriptConfig {
 export interface TextPart {
   type: 'text' | 'super' | 'sub'
   content: string
+  subtype?: 'trademark' | 'registered' | 'ordinal' | 'math' | 'chemical' | 'generic'
 }
 
 export interface PatternSet {
@@ -73,7 +74,7 @@ export interface PatternSet {
   mathSub: RegExp
 }
 
-export type ProcessingResult = {
+export interface ProcessingResult {
   modified: boolean
   parts: TextPart[]
 }

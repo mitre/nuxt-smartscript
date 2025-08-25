@@ -3,17 +3,17 @@
  * Tests the ability to selectively enable/disable transformation types
  */
 
-import { describe, it, expect } from 'vitest'
-import {
-  createPatterns,
-  createCombinedPattern,
-  processText,
-  DEFAULT_CONFIG,
-} from '../../src/runtime/smartscript'
 import type { SuperscriptConfig } from '../../src/runtime/smartscript/types'
+import { describe, expect, it } from 'vitest'
+import {
+  createCombinedPattern,
+  createPatterns,
+  DEFAULT_CONFIG,
+  processText,
+} from '../../src/runtime/smartscript'
 
-describe('Transformation Configuration', () => {
-  describe('All Transformations Enabled (Default)', () => {
+describe('transformation Configuration', () => {
+  describe('all Transformations Enabled (Default)', () => {
     it('should process all transformation types by default', () => {
       const config = DEFAULT_CONFIG
       const patterns = createPatterns(config)
@@ -29,7 +29,7 @@ describe('Transformation Configuration', () => {
     })
   })
 
-  describe('Selective Transformation Disabling', () => {
+  describe('selective Transformation Disabling', () => {
     it('should disable trademark transformation only', () => {
       const config: SuperscriptConfig = {
         ...DEFAULT_CONFIG,
@@ -134,7 +134,7 @@ describe('Transformation Configuration', () => {
     })
   })
 
-  describe('Only Specific Transformations Enabled', () => {
+  describe('only Specific Transformations Enabled', () => {
     it('should only process trademark and registered when others disabled', () => {
       const config: SuperscriptConfig = {
         ...DEFAULT_CONFIG,
@@ -191,7 +191,7 @@ describe('Transformation Configuration', () => {
     })
   })
 
-  describe('Processing with Disabled Transformations', () => {
+  describe('processing with Disabled Transformations', () => {
     it('should not transform disabled patterns in processText', () => {
       const config: SuperscriptConfig = {
         ...DEFAULT_CONFIG,
@@ -208,12 +208,12 @@ describe('Transformation Configuration', () => {
       const parts = processText(text, combined)
 
       // (TM) and 1st should remain as plain text
-      const reconstructed = parts.map(p => p.content).join('')
+      const reconstructed = parts.map((p) => p.content).join('')
       expect(reconstructed).toContain('(TM)')
       expect(reconstructed).toContain('1st')
 
       // H2O should be transformed
-      expect(parts.some(p => p.type === 'sub' && p.content === '2')).toBe(true)
+      expect(parts.some((p) => p.type === 'sub' && p.content === '2')).toBe(true)
     })
 
     it('should handle all transformations disabled', () => {
@@ -243,7 +243,7 @@ describe('Transformation Configuration', () => {
     })
   })
 
-  describe('Pattern Validation', () => {
+  describe('pattern Validation', () => {
     it('should create valid patterns even when disabled', () => {
       const config: SuperscriptConfig = {
         ...DEFAULT_CONFIG,

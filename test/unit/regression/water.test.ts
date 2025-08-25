@@ -2,15 +2,15 @@
  * Test to ensure H2O (water) works while H1-H6 headers don't transform
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  createPatterns,
   createCombinedPattern,
-  processText,
+  createPatterns,
   DEFAULT_CONFIG,
-} from '../../src/runtime/smartscript'
+  processText,
+} from '../../../src/runtime/smartscript'
 
-describe('Water and Headers Test', () => {
+describe('water and Headers Test', () => {
   const config = DEFAULT_CONFIG
   const patterns = createPatterns(config)
   const combinedPattern = createCombinedPattern(patterns, config)
@@ -54,11 +54,11 @@ describe('Water and Headers Test', () => {
     const result = processText(text, combinedPattern)
 
     // H2O should be transformed, standalone H2 should not
-    const textContent = result.map(p => p.content).join('')
+    const textContent = result.map((p) => p.content).join('')
     expect(textContent).toBe(text)
 
     // Should have at least one subscript (for H2O)
-    const subscriptCount = result.filter(p => p.type === 'sub').length
+    const subscriptCount = result.filter((p) => p.type === 'sub').length
     expect(subscriptCount).toBeGreaterThan(0)
   })
 
@@ -67,7 +67,7 @@ describe('Water and Headers Test', () => {
     const result = processText(text, combinedPattern)
 
     // Should have subscripts for both 2 and 4
-    const subscripts = result.filter(p => p.type === 'sub')
+    const subscripts = result.filter((p) => p.type === 'sub')
     expect(subscripts.length).toBe(2)
     expect(subscripts[0].content).toBe('2')
     expect(subscripts[1].content).toBe('4')
@@ -78,7 +78,7 @@ describe('Water and Headers Test', () => {
     const result = processText(text, combinedPattern)
 
     // H7 and H10 should be transformed as chemicals
-    const subscripts = result.filter(p => p.type === 'sub')
+    const subscripts = result.filter((p) => p.type === 'sub')
     expect(subscripts.length).toBe(2)
   })
 })

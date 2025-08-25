@@ -21,7 +21,7 @@ export const CSS_CLASSES = {
  */
 export const DEFAULT_CONFIG: SuperscriptConfig = {
   symbols: {
-    trademark: ['™', '(TM)', 'TM'],
+    trademark: ['™', '(TM)'], // Not standalone 'TM'
     registered: ['®', '(R)'],
     copyright: ['©', '(C)'],
     ordinals: true,
@@ -36,7 +36,12 @@ export const DEFAULT_CONFIG: SuperscriptConfig = {
       '.blog-post',
       '.blog-content',
       'section',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
       'header',
     ],
     exclude: [
@@ -83,6 +88,9 @@ export function mergeConfig(
   userConfig: Partial<SuperscriptConfig> = {},
 ): SuperscriptConfig {
   return {
+    // Include debug if provided
+    ...(userConfig.debug !== undefined && { debug: userConfig.debug }),
+
     symbols: {
       ...DEFAULT_CONFIG.symbols,
       ...userConfig.symbols,
@@ -99,6 +107,11 @@ export function mergeConfig(
       ...DEFAULT_CONFIG.positioning,
       ...userConfig.positioning,
     },
+
+    // Include all optional fields if provided
+    ...(userConfig.transformations && { transformations: userConfig.transformations }),
+    ...(userConfig.customPatterns && { customPatterns: userConfig.customPatterns }),
+    ...(userConfig.cssVariables && { cssVariables: userConfig.cssVariables }),
   }
 }
 

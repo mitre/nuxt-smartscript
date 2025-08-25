@@ -8,64 +8,64 @@
  * - Mathematical notation
  */
 
-// Export types
-export type {
-  SuperscriptConfig,
-  TextPart,
-  PatternSet,
-  ProcessingResult,
-  ProcessingOptions,
-} from './types'
-
 // Export configuration
 export {
-  DEFAULT_CONFIG,
   CSS_CLASSES,
+  DEFAULT_CONFIG,
   mergeConfig,
   validateConfig,
 } from './config'
 
-// Export patterns
-export {
-  createPatterns,
-  createCombinedPattern,
-  PatternMatchers,
-  PatternExtractors,
-} from './patterns'
-
 // Export DOM utilities
 export {
-  createSuperscriptElement,
-  createSubscriptElement,
   createFragmentFromParts,
-  shouldExcludeElement,
-  shouldIncludeElement,
+  createSubscriptElement,
+  createSuperscriptElement,
   isProcessed,
   markAsProcessed,
   resetProcessingFlags,
+  shouldExcludeElement,
+  shouldIncludeElement,
 } from './dom'
-
-// Export processor
-export {
-  processMatch,
-  processText,
-  needsProcessing,
-  clearProcessingCaches,
-} from './processor'
 
 // Export engine
 export {
-  processTextNode,
-  processElement,
-  processContent,
-  initializeForNavigation,
-  createDebouncedProcessor,
   createContentObserver,
+  createDebouncedProcessor,
+  initializeForNavigation,
+  processContent,
+  processElement,
+  processTextNode,
 } from './engine'
 
 // Export logger
 export {
-  logger,
   configureLogger,
+  logger,
   LogLevel,
 } from './logger'
+
+// Export patterns
+export {
+  createCombinedPattern,
+  createPatterns,
+  PatternExtractors,
+  PatternMatchers,
+} from './patterns'
+
+// Export processor
+export {
+  clearProcessingCaches,
+  needsProcessing,
+  processMatch,
+  processText,
+} from './processor'
+
+// Export types
+export type {
+  PatternSet,
+  ProcessingOptions,
+  ProcessingResult,
+  SuperscriptConfig,
+  TextPart,
+} from './types'

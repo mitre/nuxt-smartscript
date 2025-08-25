@@ -3,19 +3,19 @@
  * ACTUALLY tests the DOM elements created by our functions
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
 import { JSDOM } from 'jsdom'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
-  createSuperscriptElement,
-  createSubscriptElement,
-  createFragmentFromParts,
-  processText,
-  createPatterns,
   createCombinedPattern,
+  createFragmentFromParts,
+  createPatterns,
+  createSubscriptElement,
+  createSuperscriptElement,
   DEFAULT_CONFIG,
+  processText,
 } from '../../src/runtime/smartscript'
 
-describe('DOM Output: Actual Element Creation', () => {
+describe('dOM Output: Actual Element Creation', () => {
   let dom: JSDOM
   let document: Document
 
@@ -27,19 +27,19 @@ describe('DOM Output: Actual Element Creation', () => {
   })
 
   describe('createSuperscriptElement', () => {
-    it('should create sup element with ss-sup class for trademark', () => {
+    it('should create SPAN element with ss-sup class for trademark', () => {
       const element = createSuperscriptElement('™', 'trademark')
 
-      expect(element.tagName).toBe('SUP')
+      expect(element.tagName).toBe('SPAN')
       expect(element.className).toBe('ss-sup ss-tm')
       expect(element.textContent).toBe('™')
       expect(element.getAttribute('aria-label')).toBe('trademark')
     })
 
-    it('should create sup element with ss-sup class for registered', () => {
+    it('should create SPAN element with ss-sup class for registered', () => {
       const element = createSuperscriptElement('®', 'registered')
 
-      expect(element.tagName).toBe('SUP')
+      expect(element.tagName).toBe('SPAN')
       expect(element.className).toBe('ss-sup ss-reg')
       expect(element.textContent).toBe('®')
       expect(element.getAttribute('aria-label')).toBe('registered')
@@ -117,7 +117,7 @@ describe('DOM Output: Actual Element Creation', () => {
       expect(div.childNodes[0].textContent).toBe('MITRE')
 
       const sup = div.childNodes[1] as HTMLElement
-      expect(sup.tagName).toBe('SUP')
+      expect(sup.tagName).toBe('SPAN') // TM uses SPAN for positioning
       expect(sup.className).toBe('ss-sup ss-tm')
       expect(sup.textContent).toBe('™')
     })
@@ -187,7 +187,7 @@ describe('DOM Output: Actual Element Creation', () => {
     })
   })
 
-  describe('Full Pipeline: processText to DOM', () => {
+  describe('full Pipeline: processText to DOM', () => {
     const config = DEFAULT_CONFIG
     const patterns = createPatterns(config)
     const combinedPattern = createCombinedPattern(patterns, config)
@@ -198,11 +198,11 @@ describe('DOM Output: Actual Element Creation', () => {
       const div = document.createElement('div')
       div.appendChild(fragment)
 
-      // Should have text "MITRE" and superscript "™"
-      const supElements = div.querySelectorAll('sup.ss-sup')
-      expect(supElements).toHaveLength(1)
-      expect(supElements[0].className).toBe('ss-sup ss-tm')
-      expect(supElements[0].textContent).toBe('™')
+      // Should have text "MITRE" and trademark "™" as SPAN (hybrid approach)
+      const tmElements = div.querySelectorAll('span.ss-tm')
+      expect(tmElements).toHaveLength(1)
+      expect(tmElements[0].className).toBe('ss-sup ss-tm')
+      expect(tmElements[0].textContent).toBe('™')
     })
 
     it('should process ordinal numbers correctly', () => {
@@ -274,11 +274,15 @@ describe('DOM Output: Actual Element Creation', () => {
       const div = document.createElement('div')
       div.appendChild(fragment)
 
-      // Check all transformations
+      // Check all transformations - with hybrid approach (SUP for math/ordinals, SPAN for TM)
       const supElements = div.querySelectorAll('sup.ss-sup')
+      const spanElements = div.querySelectorAll('span.ss-sup')
 
-      // Should have multiple superscripts (1st, ^2, TM)
+      // Should have SUP elements for ordinals and math
       expect(supElements.length).toBeGreaterThan(0)
+
+      // Should have SPAN elements for TM symbols
+      expect(spanElements.length).toBeGreaterThan(0)
 
       // H_2O has uppercase H, our pattern expects lowercase for subscripts
       // Let's test with a valid subscript pattern
@@ -291,11 +295,12 @@ describe('DOM Output: Actual Element Creation', () => {
       expect(subElements2.length).toBeGreaterThan(0)
 
       // Verify specific classes
-      const ordinalSup = Array.from(supElements).find(el => el.className.includes('ss-ordinal'))
+      const ordinalSup = Array.from(supElements).find((el) => el.className.includes('ss-ordinal'))
       expect(ordinalSup).toBeDefined()
 
-      const tmSup = Array.from(supElements).find(el => el.className.includes('ss-tm'))
-      expect(tmSup).toBeDefined()
+      // TM is now a SPAN element with hybrid approach
+      const tmSpan = div.querySelector('span.ss-tm')
+      expect(tmSpan).toBeDefined()
     })
   })
 })

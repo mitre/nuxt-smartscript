@@ -2,9 +2,9 @@
  * Text processing logic for SmartScript
  */
 
-import type { TextPart, ProcessingResult } from './types'
-import { PatternMatchers, PatternExtractors } from './patterns'
+import type { ProcessingResult, TextPart } from './types'
 import { logger } from './logger'
+import { PatternExtractors, PatternMatchers } from './patterns'
 
 // Cache for processed text to avoid redundant processing
 // WeakMap allows garbage collection when text nodes are removed
@@ -50,18 +50,20 @@ export function processMatch(matched: string): ProcessingResult {
       parts: [{
         type: 'super',
         content: '™',
+        subtype: 'trademark',
       }],
     }
   }
 
-  // Registered symbols - Unicode character already positioned
+  // Registered symbols - needs superscript treatment like TM
   if (PatternMatchers.isRegistered(matched)) {
     logger.debug('Registered match confirmed for:', matched)
     return {
       modified: true,
       parts: [{
-        type: 'text',
+        type: 'super',
         content: '®',
+        subtype: 'registered',
       }],
     }
   }
@@ -90,17 +92,13 @@ export function processMatch(matched: string): ProcessingResult {
       let expectedSuffix: string
       if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
         expectedSuffix = 'th' // 11th, 12th, 13th
-      }
-      else if (lastDigit === 1) {
+      } else if (lastDigit === 1) {
         expectedSuffix = 'st' // 1st, 21st, 31st, etc.
-      }
-      else if (lastDigit === 2) {
+      } else if (lastDigit === 2) {
         expectedSuffix = 'nd' // 2nd, 22nd, 32nd, etc.
-      }
-      else if (lastDigit === 3) {
+      } else if (lastDigit === 3) {
         expectedSuffix = 'rd' // 3rd, 23rd, 33rd, etc.
-      }
-      else {
+      } else {
         expectedSuffix = 'th' // 4th, 5th, 6th, etc.
       }
 
@@ -111,11 +109,10 @@ export function processMatch(matched: string): ProcessingResult {
           modified: true,
           parts: [
             { type: 'text', content: ordinal.number },
-            { type: 'super', content: ordinal.suffix },
+            { type: 'super', content: ordinal.suffix, subtype: 'ordinal' },
           ],
         }
-      }
-      else {
+      } else {
         // Invalid ordinal - don't transform
         logger.trace('Invalid ordinal suffix:', matched)
         return {
@@ -135,7 +132,7 @@ export function processMatch(matched: string): ProcessingResult {
         modified: true,
         parts: [
           { type: 'text', content: ')' },
-          { type: 'sub', content: number },
+          { type: 'sub', content: number, subtype: 'chemical' },
         ],
       }
     }
@@ -154,7 +151,7 @@ export function processMatch(matched: string): ProcessingResult {
         modified: true,
         parts: [
           { type: 'text', content: chemical.element },
-          { type: 'sub', content: chemical.count },
+          { type: 'sub', content: chemical.count, subtype: 'chemical' },
         ],
       }
     }
@@ -169,7 +166,7 @@ export function processMatch(matched: string): ProcessingResult {
         modified: true,
         parts: [
           { type: 'text', content: parts.variable },
-          { type: 'super', content: parts.script },
+          { type: 'super', content: parts.script, subtype: 'math' },
         ],
       }
     }
@@ -184,7 +181,7 @@ export function processMatch(matched: string): ProcessingResult {
         modified: true,
         parts: [
           { type: 'text', content: parts.variable },
-          { type: 'sub', content: parts.script },
+          { type: 'sub', content: parts.script, subtype: 'math' },
         ],
       }
     }

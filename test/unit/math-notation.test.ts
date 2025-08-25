@@ -1,13 +1,13 @@
-import { describe, it, expect } from 'vitest'
-import { createPatterns, createCombinedPattern } from '../../src/runtime/smartscript/patterns'
-import { processMatch } from '../../src/runtime/smartscript/processor'
+import { describe, expect, it } from 'vitest'
 import { DEFAULT_CONFIG } from '../../src/runtime/smartscript/config'
+import { createCombinedPattern, createPatterns } from '../../src/runtime/smartscript/patterns'
+import { processMatch } from '../../src/runtime/smartscript/processor'
 
-describe('Mathematical Notation Support', () => {
+describe('mathematical Notation Support', () => {
   const config = DEFAULT_CONFIG
   const patterns = createPatterns(config)
 
-  describe('LaTeX-style Notation', () => {
+  describe('laTeX-style Notation', () => {
     it('should support both x_n and x_{n} formats for subscripts', () => {
       const pattern = patterns.mathSub
 
@@ -47,7 +47,7 @@ describe('Mathematical Notation Support', () => {
     })
   })
 
-  describe('Real-world Mathematical Expressions', () => {
+  describe('real-world Mathematical Expressions', () => {
     it('should handle common mathematical sequences', () => {
       const combined = createCombinedPattern(patterns, config)
 
@@ -103,7 +103,7 @@ describe('Mathematical Notation Support', () => {
     })
   })
 
-  describe('Edge Cases and Non-matches', () => {
+  describe('edge Cases and Non-matches', () => {
     it('should not match underscores in file names or identifiers', () => {
       const combined = createCombinedPattern(patterns, config)
 
@@ -156,7 +156,7 @@ describe('Mathematical Notation Support', () => {
     })
   })
 
-  describe('Processing Results', () => {
+  describe('processing Results', () => {
     it('should correctly process single-letter subscripts', () => {
       const result = processMatch('x_n')
       expect(result.modified).toBe(true)

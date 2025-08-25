@@ -10,7 +10,7 @@
   --ss-sup-font-size: 0.75em;
   --ss-sup-vertical-align: super;
   --ss-sup-line-height: 0;
-  --ss-sup-top: 0.15em;
+  --ss-sup-top: 0.08em;
   --ss-sup-margin-left: 0.05em;
   --ss-sup-margin-right: 0.1em;
   --ss-sup-letter-spacing: 0.025em;
@@ -32,21 +32,41 @@
 
 /* ============================================
    Core Superscript Styling
-   Best practice: Use vertical-align: super with line-height: 0
+   Handles both SUP (semantic) and SPAN (positioned) elements
    ============================================ */
 sup.ss-sup {
   /* Size reduction */
   font-size: var(--ss-sup-font-size);
   
   /* Use browser's native superscript positioning */
-  vertical-align: var(--ss-sup-vertical-align);
+  vertical-align: super;
   
   /* Prevent line-height disruption */
-  line-height: var(--ss-sup-line-height);
+  line-height: 0;
   
-  /* Fine-tune position - bring down slightly from browser default */
+  /* Note: position:relative doesn't work on SUP elements */
+  
+  /* Spacing */
+  margin-left: var(--ss-sup-margin-left);
+  margin-right: var(--ss-sup-margin-right);
+  
+  /* Inherit parent styles */
+  font-weight: inherit;
+  letter-spacing: var(--ss-sup-letter-spacing);
+}
+
+/* For elements that need positioning control (using SPAN) */
+span.ss-sup {
+  /* Size reduction */
+  font-size: var(--ss-sup-font-size);
+  
+  /* Manual positioning for precise control */
   position: relative;
-  top: var(--ss-sup-top);  /* Scales with font size */
+  top: -0.3em; /* Negative value to raise it up */
+  vertical-align: baseline;
+  
+  /* Prevent line-height disruption */
+  line-height: 0;
   
   /* Spacing */
   margin-left: var(--ss-sup-margin-left);
@@ -59,16 +79,17 @@ sup.ss-sup {
 
 /* ============================================
    Core Subscript Styling
+   Using semantic SUB elements
    ============================================ */
 sub.ss-sub {
   /* Size reduction */
   font-size: var(--ss-sub-font-size);
   
   /* Use browser's native subscript positioning */
-  vertical-align: var(--ss-sub-vertical-align);
+  vertical-align: sub;
   
   /* Prevent line-height disruption */
-  line-height: var(--ss-sub-line-height);
+  line-height: 0;
   
   /* Spacing */
   margin-left: var(--ss-sub-margin-left);
@@ -82,7 +103,7 @@ sub.ss-sub {
 /* ============================================
    Headings: Slightly smaller for visual balance
    ============================================ */
-:is(h1, h2, h3, h4, h5, h6) sup.ss-sup,
+:is(h1, h2, h3, h4, h5, h6) :is(sup.ss-sup, span.ss-sup),
 :is(h1, h2, h3, h4, h5, h6) sub.ss-sub {
   font-size: var(--ss-heading-font-size);
 }
@@ -92,17 +113,19 @@ sub.ss-sub {
    ============================================ */
 
 /* Remove spacing between consecutive super/subscripts */
-:is(sup.ss-sup, sub.ss-sub) + :is(sup.ss-sup, sub.ss-sub) {
+:is(sup.ss-sup, span.ss-sup, sub.ss-sub) + :is(sup.ss-sup, span.ss-sup, sub.ss-sub) {
   margin-left: 0;
 }
 
-/* Specific symbol classes for semantic clarity */
-sup.ss-tm {
-  /* Inherits from ss-sup */
+/* Specific symbol classes for positioning control (TM and R use SPAN) */
+span.ss-tm {
+  /* Override the default top position for trademark */
+  top: var(--ss-tm-top, -0.4em);
 }
 
-sup.ss-reg {
-  /* Inherits from ss-sup */
+span.ss-reg {
+  /* Override the default top position for registered */
+  top: var(--ss-reg-top, -0.4em);
 }
 
 /* ============================================
@@ -111,7 +134,7 @@ sup.ss-reg {
 
 /* Print optimization */
 @media print {
-  sup.ss-sup, 
+  :is(sup.ss-sup, span.ss-sup), 
   sub.ss-sub {
     font-size: var(--ss-print-font-size);
   }
@@ -119,7 +142,7 @@ sup.ss-reg {
 
 /* High contrast mode */
 @media (prefers-contrast: high) {
-  sup.ss-sup, 
+  :is(sup.ss-sup, span.ss-sup), 
   sub.ss-sub {
     font-weight: bold;
   }
@@ -127,7 +150,7 @@ sup.ss-reg {
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  sup.ss-sup, 
+  :is(sup.ss-sup, span.ss-sup), 
   sub.ss-sub {
     transition: none;
   }

@@ -2,10 +2,10 @@
  * Tests for CSS Variables configuration
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { JSDOM } from 'jsdom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-describe('CSS Variables Configuration', () => {
+describe('cSS Variables Configuration', () => {
   let dom: JSDOM
   let document: Document
   let window: Window

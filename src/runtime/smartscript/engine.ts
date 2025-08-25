@@ -2,17 +2,16 @@
  * Core processing engine for SmartScript
  */
 
-import type { SuperscriptConfig, PatternSet } from './types'
-import { processText, needsProcessing, clearProcessingCaches } from './processor'
-import { logger } from './logger'
+import type { PatternSet, SuperscriptConfig } from './types'
 import {
   createFragmentFromParts,
-  shouldExcludeElement,
   isProcessed,
   markAsProcessed,
   resetProcessingFlags,
+  shouldExcludeElement,
 } from './dom'
-import { CSS_CLASSES } from './config'
+import { logger } from './logger'
+import { clearProcessingCaches, needsProcessing, processText } from './processor'
 
 /**
  * Process a single text node
@@ -33,8 +32,8 @@ export function processTextNode(
 
   // Check if we actually modified the content
   // Either we have non-text parts (super/sub) OR the text content changed
-  const hasModifications = parts.some(p => p.type !== 'text')
-    || parts.map(p => p.content).join('') !== text
+  const hasModifications = parts.some((p) => p.type !== 'text')
+    || parts.map((p) => p.content).join('') !== text
 
   if (hasModifications) {
     logger.debug('Found modifications, replacing node')
@@ -71,10 +70,18 @@ function createTextNodeFilter(
         return NodeFilter.FILTER_REJECT
       }
 
-      // Skip if parent is one of our generated elements
+      // Skip if parent is one of our generated elements (including from SSR)
       if (parent && (
-        (parent.tagName === 'SUP' && parent.classList.contains(CSS_CLASSES.superscript))
-        || (parent.tagName === 'SUB' && parent.classList.contains(CSS_CLASSES.subscript))
+        parent.classList.contains('ss-tm')
+        || parent.classList.contains('ss-reg')
+        || parent.classList.contains('ss-sup')
+        || parent.classList.contains('ss-sub')
+        || parent.classList.contains('ss-ordinal')
+        || parent.classList.contains('ss-chemical')
+        || parent.classList.contains('ss-math')
+        || (parent.tagName === 'SUP' && parent.className.includes('ss-'))
+        || (parent.tagName === 'SUB' && parent.className.includes('ss-'))
+        || (parent.tagName === 'SPAN' && parent.className.includes('ss-'))
       )) {
         return NodeFilter.FILTER_REJECT
       }
@@ -189,8 +196,7 @@ export function processContent(
         logger.debug(`Found ${elements.length} elements for selector "${selector}"`)
         allElements.push(...Array.from(elements))
       }
-    }
-    catch (error) {
+    } catch (error) {
       logger.warn(`Invalid selector: ${selector}`, error)
     }
   })
@@ -199,8 +205,7 @@ export function processContent(
   if (allElements.length > 20) {
     // Use batching for large element counts
     batchProcessElements(allElements, config, patterns, combinedPattern)
-  }
-  else {
+  } else {
     // Process immediately for small counts
     allElements.forEach((element) => {
       processElement(element, config, patterns, combinedPattern)
@@ -259,7 +264,7 @@ export function createContentObserver(
 
   return new MutationObserver((mutations: MutationRecord[]) => {
     const hasNewContent = mutations.some(
-      mutation => mutation.type === 'childList' && mutation.addedNodes.length > 0,
+      (mutation) => mutation.type === 'childList' && mutation.addedNodes.length > 0,
     )
 
     if (hasNewContent) {

@@ -34,8 +34,7 @@ export const ErrorCodes = {
 export function handleError(error: unknown, context: string): void {
   if (process.env.NODE_ENV === 'development') {
     console.error(`[SmartScript] ${context}:`, error)
-  }
-  else {
+  } else {
     // In production, log less verbose errors
     console.warn(`[SmartScript] ${context}`)
   }
@@ -51,8 +50,7 @@ export function safeExecute<T>(
 ): T {
   try {
     return operation()
-  }
-  catch (error) {
+  } catch (error) {
     handleError(error, context)
     return fallback
   }
@@ -68,8 +66,7 @@ export async function safeExecuteAsync<T>(
 ): Promise<T> {
   try {
     return await operation()
-  }
-  catch (error) {
+  } catch (error) {
     handleError(error, context)
     return fallback
   }
@@ -83,8 +80,7 @@ export function sanitizeSelector(selector: string): string | null {
     // Test if selector is valid
     document.querySelector(selector)
     return selector
-  }
-  catch {
+  } catch {
     return null
   }
 }
