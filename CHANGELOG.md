@@ -5,6 +5,59 @@ All notable changes to nuxt-smartscript will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.3.1
+
+[compare changes](https://github.com/mitre/nuxt-smartscript/compare/v0.3.0...v0.3.1)
+
+### 🚀 Enhancements
+
+- Add server-side rendering (SSR) and static generation (SSG) support ([cdabdca](https://github.com/mitre/nuxt-smartscript/commit/cdabdca))
+- Migrate to @nuxt/module-builder for proper TypeScript support ([86a2211](https://github.com/mitre/nuxt-smartscript/commit/86a2211))
+- V0.4.0 - SSR support, expanded selectors, DRY fixes ([1878204](https://github.com/mitre/nuxt-smartscript/commit/1878204))
+
+### 🩹 Fixes
+
+- Correct trademark pattern to not match standalone TM ([2f600b1](https://github.com/mitre/nuxt-smartscript/commit/2f600b1))
+- Correct GitHub Actions workflow order for pnpm setup ([32ecec2](https://github.com/mitre/nuxt-smartscript/commit/32ecec2))
+- Use playwright-core command instead of playwright ([63b9d33](https://github.com/mitre/nuxt-smartscript/commit/63b9d33))
+- Resolve TypeScript errors for v0.4.0 release ([68510e0](https://github.com/mitre/nuxt-smartscript/commit/68510e0))
+- Resolve all TypeScript strict null check errors ([5320453](https://github.com/mitre/nuxt-smartscript/commit/5320453))
+- Hardcode Apache-2.0 license badge in docs ([60d2342](https://github.com/mitre/nuxt-smartscript/commit/60d2342))
+- Correct release scripts to use proper changelogen flags ([06f9da5](https://github.com/mitre/nuxt-smartscript/commit/06f9da5))
+- Add dev:prepare step to release workflow for tsconfig generation ([a017a5b](https://github.com/mitre/nuxt-smartscript/commit/a017a5b))
+
+### 💅 Refactors
+
+- Update tests and runtime for v0.4.0 compatibility ([8801208](https://github.com/mitre/nuxt-smartscript/commit/8801208))
+
+### 📖 Documentation
+
+- Add comprehensive v0.4.0 documentation ([9542f89](https://github.com/mitre/nuxt-smartscript/commit/9542f89))
+- Update performance and contributing documentation ([aab6f0c](https://github.com/mitre/nuxt-smartscript/commit/aab6f0c))
+- Add TypeScript architecture documentation ([ba12ed5](https://github.com/mitre/nuxt-smartscript/commit/ba12ed5))
+- Improve navigation structure for better user workflow ([74642fa](https://github.com/mitre/nuxt-smartscript/commit/74642fa))
+- Rename LICENSE.md to LICENSE and update documentation ([0530671](https://github.com/mitre/nuxt-smartscript/commit/0530671))
+- Update README and CLAUDE.md for v0.4.0 release ([0690ab4](https://github.com/mitre/nuxt-smartscript/commit/0690ab4))
+
+### 🏡 Chore
+
+- Add vitepress-plugin-mermaid for documentation diagrams ([898ceb9](https://github.com/mitre/nuxt-smartscript/commit/898ceb9))
+- Update eslint and TypeScript configuration ([b1138d6](https://github.com/mitre/nuxt-smartscript/commit/b1138d6))
+- Move CLAUDE.md to local-only file ([42bc13b](https://github.com/mitre/nuxt-smartscript/commit/42bc13b))
+
+### ✅ Tests
+
+- Add comprehensive SSR and integration tests ([fdcd25a](https://github.com/mitre/nuxt-smartscript/commit/fdcd25a))
+- Update playground for SSR testing ([95239be](https://github.com/mitre/nuxt-smartscript/commit/95239be))
+
+### 🤖 CI
+
+- Improve GitHub Actions workflows ([850a913](https://github.com/mitre/nuxt-smartscript/commit/850a913))
+
+### ❤️ Contributors
+
+- Aaron Lippold ([@aaronlippold](https://github.com/aaronlippold))
+
 ## v0.3.0
 
 [compare changes](https://github.com/mitre/nuxt-smartscript/compare/v0.1.2...v0.3.0)
