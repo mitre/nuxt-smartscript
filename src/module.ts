@@ -1,5 +1,5 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit'
 import { fileURLToPath } from 'node:url'
+import { addPlugin, addServerPlugin, createResolver, defineNuxtModule } from '@nuxt/kit'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
@@ -86,12 +86,26 @@ export interface ModuleOptions {
   cssVariables?: Record<string, string>
 
   /**
-   * Enable static site processing
-   * When true, processes content during build/generation for SSG sites
-   * This ensures transformed content is in the HTML (better SEO, no FOUC)
+   * Enable server-side rendering (SSR) and static generation (SSG) processing
+   * When true, processes content during SSR/SSG for better SEO and performance
+   * In development, SSR is disabled by default to avoid hydration warnings
+   * Use 'force' to enable SSR even in development mode
+   * @default true (false in dev unless 'force')
+   */
+  ssr?: boolean | 'force'
+
+  /**
+   * Enable client-side processing for dynamic content
+   * When true, processes content in the browser using MutationObserver
+   * @default true
+   */
+  client?: boolean
+
+  /**
+   * Enable debug logging
    * @default false
    */
-  processStatic?: boolean
+  debug?: boolean
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -134,7 +148,12 @@ export default defineNuxtModule<ModuleOptions>({
         '.blog-post',
         '.blog-content',
         'section',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
         'header',
       ],
       exclude: [
@@ -160,7 +179,9 @@ export default defineNuxtModule<ModuleOptions>({
       mathSuper: true,
       mathSub: true,
     },
-    processStatic: false,
+    ssr: true,
+    client: true,
+    debug: false,
   },
 
   setup(options, nuxt) {
@@ -174,11 +195,25 @@ export default defineNuxtModule<ModuleOptions>({
     // Transpile runtime
     nuxt.options.build.transpile.push(runtimeDir)
 
-    // Add the plugin (client-side only)
-    addPlugin({
-      src: resolver.resolve('./runtime/plugin'),
-      mode: 'client',
-    })
+    // Add client-side plugin if enabled
+    if (options.client !== false) {
+      addPlugin({
+        src: resolver.resolve('./runtime/plugin'),
+        mode: 'client',
+      })
+    }
+
+    // Add server-side plugin for SSR/SSG if enabled
+    // In development, disable SSR by default to avoid hydration warnings
+    // Only enable in dev if user explicitly forces it with ssr: 'force'
+    const shouldEnableSSR = options.ssr !== false && (
+      !nuxt.options.dev // Production/generate mode
+      || options.ssr === 'force' // Explicitly force SSR in dev
+    )
+
+    if (shouldEnableSSR) {
+      addServerPlugin(resolver.resolve('./runtime/nitro/plugin-jsdom'))
+    }
 
     // Add CSS file
     nuxt.options.css.push(resolver.resolve('./runtime/superscript.css'))
