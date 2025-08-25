@@ -45,7 +45,7 @@ features:
 <p>
   <a href="https://www.npmjs.com/package/@mitre/nuxt-smartscript"><img src="https://img.shields.io/npm/v/@mitre/nuxt-smartscript?style=flat&colorA=18181B&colorB=28CF8D" alt="Version"></a>&nbsp;
   <a href="https://www.npmjs.com/package/@mitre/nuxt-smartscript"><img src="https://img.shields.io/npm/dm/@mitre/nuxt-smartscript?style=flat&colorA=18181B&colorB=28CF8D" alt="Downloads"></a>&nbsp;
-  <a href="https://github.com/mitre/nuxt-smartscript/blob/main/LICENSE"><img src="https://img.shields.io/github/license/mitre/nuxt-smartscript?style=flat&colorA=18181B&colorB=28CF8D" alt="License"></a>
+  <a href="https://github.com/mitre/nuxt-smartscript/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-brightgreen.svg?style=flat&colorA=18181B&colorB=28CF8D" alt="License"></a>
 </p>
 
 Nuxt SmartScript is a powerful Nuxt module that automatically transforms typography patterns in your content to enhance readability and visual appeal. It works seamlessly with your existing Nuxt application, requiring minimal configuration.
