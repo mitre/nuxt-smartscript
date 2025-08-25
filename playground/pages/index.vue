@@ -1,3 +1,42 @@
+<script setup>
+import { useNuxtApp } from '#app'
+import { onMounted, ref } from 'vue'
+
+const { $smartscript } = useNuxtApp()
+const debugMode = ref(false)
+const stats = ref(null)
+
+function toggleDebug() {
+  if ($smartscript) {
+    debugMode.value = !debugMode.value
+    const config = $smartscript.getConfig()
+    $smartscript.updateConfig({ ...config, debug: debugMode.value })
+    // Debug mode toggle handled by updateConfig
+  }
+}
+
+function manualProcess() {
+  if ($smartscript) {
+    $smartscript.process()
+    stats.value = $smartscript.getStats()
+  }
+}
+
+function getStats() {
+  if ($smartscript) {
+    stats.value = $smartscript.getStats()
+  }
+}
+
+onMounted(() => {
+  // Get initial debug state
+  if ($smartscript) {
+    const config = $smartscript.getConfig()
+    debugMode.value = config.debug || false
+  }
+})
+</script>
+
 <template>
   <div class="container">
     <h1>H1: Nuxt SmartScript™ Demo - MITRE(TM)</h1>
@@ -9,7 +48,7 @@
 
     <section>
       <h2>Debug Info</h2>
-      <p>Plugin status: {{ $smartscript ? 'Loaded' : 'Not loaded' }}</p>
+      <p>Plugin status: <ClientOnly><span>{{ $smartscript ? 'Loaded' : 'Not loaded' }}</span></ClientOnly></p>
       <p>Debug mode: {{ debugMode ? 'ON' : 'OFF' }}</p>
       <button @click="toggleDebug">
         Toggle Debug Mode
@@ -23,6 +62,8 @@
       <div v-if="stats">
         <p>Processed elements: {{ stats.processedElements }}</p>
         <p>Superscripts: {{ stats.superscripts }}, Subscripts: {{ stats.subscripts }}</p>
+        <p>Trademarks: {{ stats.trademarks }}, Registered: {{ stats.registered }}</p>
+        <p>Total transformations: {{ stats.total }}</p>
       </div>
     </section>
 
@@ -104,12 +145,12 @@
     <section>
       <h2>Exclusions & Edge Cases</h2>
       <h3>Code Blocks (Not Transformed)</h3>
-      <pre>Code blocks should not transform: H2O, 1st, Product™, x^2</pre>
-      <code>Inline code: H2O, CO2, 1st, E=mc^2</code>
+      <pre>Code blocks should not transform: H2O, 1st, Product(TM), x^2</pre>
+      <code>Inline code: H2O, CO2, 1st, Product(TM), E=mc^2</code>
 
       <h3>Explicit Exclusion</h3>
       <div data-no-superscript>
-        <p>This section excluded: H2O, CO2, 1st, Product™, x^2</p>
+        <p>This section excluded: H2O, CO2, 1st, Product(TM), x^2</p>
       </div>
 
       <h3>Programming Identifiers (Correctly Not Transformed)</h3>
@@ -123,49 +164,12 @@
 
     <section>
       <h2>Navigation Test</h2>
-      <NuxtLink to="/test">Test Page Link</NuxtLink>
+      <NuxtLink to="/test">
+        Test Page Link
+      </NuxtLink>
     </section>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-import { useNuxtApp } from '#app'
-
-const { $smartscript } = useNuxtApp()
-const debugMode = ref(false)
-const stats = ref(null)
-
-const toggleDebug = () => {
-  if ($smartscript) {
-    debugMode.value = !debugMode.value
-    const config = $smartscript.getConfig()
-    $smartscript.updateConfig({ ...config, debug: debugMode.value })
-    // Debug mode toggle handled by updateConfig
-  }
-}
-
-const manualProcess = () => {
-  if ($smartscript) {
-    $smartscript.process()
-    stats.value = $smartscript.getStats()
-  }
-}
-
-const getStats = () => {
-  if ($smartscript) {
-    stats.value = $smartscript.getStats()
-  }
-}
-
-onMounted(() => {
-  // Get initial debug state
-  if ($smartscript) {
-    const config = $smartscript.getConfig()
-    debugMode.value = config.debug || false
-  }
-})
-</script>
 
 <style scoped>
 .container {

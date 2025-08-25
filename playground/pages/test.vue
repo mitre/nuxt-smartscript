@@ -6,7 +6,9 @@
     <p>Chemical formula: H2O and CO2</p>
     <p>Ordinals: 1st, 2nd, 3rd test</p>
 
-    <NuxtLink to="/">Back to Home</NuxtLink>
+    <NuxtLink to="/">
+      Back to Home
+    </NuxtLink>
   </div>
 </template>
 
