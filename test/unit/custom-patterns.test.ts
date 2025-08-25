@@ -3,22 +3,22 @@
  * Tests the ability to override default patterns with custom regex
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  createPatterns,
-  createCombinedPattern,
-  processText,
-  DEFAULT_CONFIG,
-} from '../../src/runtime/smartscript'
 import type { SuperscriptConfig } from '../../src/runtime/smartscript/types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  createCombinedPattern,
+  createPatterns,
+  DEFAULT_CONFIG,
+  processText,
+} from '../../src/runtime/smartscript'
 
-describe('Custom Pattern Configuration', () => {
+describe('custom Pattern Configuration', () => {
   beforeEach(() => {
     // Clear any console mocks
     vi.clearAllMocks()
   })
 
-  describe('Default Patterns', () => {
+  describe('default Patterns', () => {
     it('should use default patterns when no custom patterns provided', () => {
       const config = DEFAULT_CONFIG
       const patterns = createPatterns(config)
@@ -30,7 +30,7 @@ describe('Custom Pattern Configuration', () => {
     })
   })
 
-  describe('Custom Pattern Override', () => {
+  describe('custom Pattern Override', () => {
     it('should use custom trademark pattern', () => {
       const config: SuperscriptConfig = {
         ...DEFAULT_CONFIG,
@@ -119,7 +119,7 @@ describe('Custom Pattern Configuration', () => {
     })
   })
 
-  describe('Invalid Pattern Handling', () => {
+  describe('invalid Pattern Handling', () => {
     it('should fall back to default when custom pattern is invalid', () => {
       // Mock console to check for warnings
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
@@ -136,7 +136,7 @@ describe('Custom Pattern Configuration', () => {
 
       // Should fall back to default pattern
       expect('Product(TM)'.match(patterns.trademark)).toContain('(TM)')
-      expect('TM'.match(patterns.trademark)).toContain('TM') // Default includes standalone
+      expect('TM'.match(patterns.trademark)).toBeNull() // Default doesn't include standalone TM
 
       warnSpy.mockRestore()
     })
@@ -174,7 +174,7 @@ describe('Custom Pattern Configuration', () => {
     })
   })
 
-  describe('Complex Custom Patterns', () => {
+  describe('complex Custom Patterns', () => {
     it('should support complex trademark variations', () => {
       const config: SuperscriptConfig = {
         ...DEFAULT_CONFIG,
@@ -219,7 +219,7 @@ describe('Custom Pattern Configuration', () => {
     })
   })
 
-  describe('Processing with Custom Patterns', () => {
+  describe('processing with Custom Patterns', () => {
     it('should process text correctly with custom patterns', () => {
       const config: SuperscriptConfig = {
         ...DEFAULT_CONFIG,
@@ -236,10 +236,10 @@ describe('Custom Pattern Configuration', () => {
       const parts = processText(text, combined)
 
       // Only (TM) should be transformed
-      const hasTransformedTM = parts.some(p =>
+      const hasTransformedTM = parts.some((p) =>
         p.type === 'super' && p.content === '™',
       )
-      const plainText = parts.map(p => p.content).join('')
+      const plainText = parts.map((p) => p.content).join('')
 
       expect(hasTransformedTM).toBe(true)
       expect(plainText).toContain('TM technology') // Standalone TM unchanged

@@ -3,25 +3,25 @@
  * Tests that our regex patterns match the correct strings
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   createPatterns,
-  PatternMatchers,
   DEFAULT_CONFIG,
+  PatternMatchers,
 } from '../../src/runtime/smartscript'
 
-describe('Pattern Matching', () => {
+describe('pattern Matching', () => {
   const patterns = createPatterns(DEFAULT_CONFIG)
 
-  describe('Trademark Patterns', () => {
+  describe('trademark Patterns', () => {
     it('should match (TM) pattern', () => {
       const matches = '(TM)'.match(patterns.trademark)
       expect(matches).toContain('(TM)')
     })
 
-    it('should match standalone TM', () => {
+    it('should NOT match standalone TM', () => {
       const matches = 'Product TM'.match(patterns.trademark)
-      expect(matches).toContain('TM')
+      expect(matches).toBeNull()
     })
 
     it('should match ™ symbol', () => {
@@ -32,7 +32,7 @@ describe('Pattern Matching', () => {
     it('should identify trademark patterns', () => {
       expect(PatternMatchers.isTrademark('™')).toBe(true)
       expect(PatternMatchers.isTrademark('(TM)')).toBe(true)
-      expect(PatternMatchers.isTrademark('TM')).toBe(true)
+      expect(PatternMatchers.isTrademark('TM')).toBe(false)
       expect(PatternMatchers.isTrademark('tm')).toBe(false)
     })
 
@@ -48,8 +48,8 @@ describe('Pattern Matching', () => {
 
     it('should not match partial patterns', () => {
       expect('(T M)'.match(patterns.trademark)).toBeNull()
-      expect('(TM'.match(patterns.trademark)).toContain('TM') // TM is valid standalone even with incomplete (
-      expect('TM)'.match(patterns.trademark)).toContain('TM') // TM is valid standalone
+      expect('(TM'.match(patterns.trademark)).toBeNull() // Incomplete pattern
+      expect('TM)'.match(patterns.trademark)).toBeNull() // Standalone TM not matched
       expect('((TM))'.match(patterns.trademark)).toContain('(TM)')
     })
 
@@ -59,7 +59,7 @@ describe('Pattern Matching', () => {
     })
   })
 
-  describe('Registered Patterns', () => {
+  describe('registered Patterns', () => {
     it('should match (R) pattern', () => {
       const matches = '(R)'.match(patterns.registered)
       expect(matches).toContain('(R)')
@@ -86,7 +86,7 @@ describe('Pattern Matching', () => {
     })
   })
 
-  describe('Copyright Patterns', () => {
+  describe('copyright Patterns', () => {
     it('should match (C) pattern', () => {
       const matches = '(C)'.match(patterns.copyright)
       expect(matches).toContain('(C)')
@@ -109,7 +109,7 @@ describe('Pattern Matching', () => {
     })
   })
 
-  describe('Ordinal Patterns', () => {
+  describe('ordinal Patterns', () => {
     it('should match ordinal patterns', () => {
       expect('1st'.match(patterns.ordinals)).toEqual(['1st'])
       expect('2nd'.match(patterns.ordinals)).toEqual(['2nd'])
@@ -162,7 +162,7 @@ describe('Pattern Matching', () => {
     })
   })
 
-  describe('Chemical Patterns', () => {
+  describe('chemical Patterns', () => {
     it('should match simple chemical formulas', () => {
       const h2 = 'H2'.match(patterns.chemicals)
       expect(h2).toContain('H2')
@@ -217,7 +217,7 @@ describe('Pattern Matching', () => {
     })
   })
 
-  describe('Math Superscript Patterns', () => {
+  describe('math Superscript Patterns', () => {
     it('should match superscript notation', () => {
       const pattern = patterns.mathSuper
 
@@ -253,7 +253,7 @@ describe('Pattern Matching', () => {
     })
   })
 
-  describe('Math Subscript Patterns', () => {
+  describe('math Subscript Patterns', () => {
     it('should match subscript notation', () => {
       const pattern = patterns.mathSub
 

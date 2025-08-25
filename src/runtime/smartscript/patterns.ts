@@ -10,7 +10,7 @@ import { logger } from './logger'
 // ============================================
 
 // Symbol patterns
-const TRADEMARK_PATTERN = /™|\(TM\)|\bTM\b/
+const TRADEMARK_PATTERN = /™|\(TM\)/ // Only (TM), not standalone TM
 const REGISTERED_PATTERN = /®|\(R\)(?!\))/
 const COPYRIGHT_PATTERN = /©|\(C\)(?!\))/
 
@@ -24,10 +24,12 @@ const CHEMICALS_PATTERN = /([A-Z][a-z]?)(\d+)|\)(\d+)/
 
 // Math notation patterns (with lookbehind for context)
 const MATH_SUPER_PATTERN = /(?<=^|[\s=+\-*/().,\da-z])([a-zA-Z])\^(\d+|[a-zA-Z]|\{[^}]+\})/
-const MATH_SUB_PATTERN = /(?<=^|[\s=+\-*/().,])([a-z])_(\d+|[a-z]|\{[^}]+\})/i
+// Subscript pattern - only match in math context, not within identifiers
+// This prevents matching within programming identifiers like MAX_SIZE
+const MATH_SUB_PATTERN = /(?<=^|[\s=+\-*/().,])([a-zA-Z])_(\d+|[a-zA-Z]|\{[^}]+\})/
 
 // Utility patterns for validation (used by PatternMatchers)
-const TRADEMARK_VALIDATE = /^(?:™|\(TM\)|TM)$/
+const TRADEMARK_VALIDATE = /^(?:™|\(TM\))$/ // Only (TM), not standalone TM
 const REGISTERED_VALIDATE = /^(?:®|\(R\))$/
 const ORDINAL_VALIDATE = /^\d+(?:st|nd|rd|th)$/
 // Standard chemical validation - H1-H6 exclusion is handled in processTextInternal
@@ -58,8 +60,7 @@ function safeCreateRegex(pattern: string | undefined, defaultPattern: RegExp, na
     'test'.match(regex)
     logger.debug('Custom pattern applied for:', name, '→', pattern)
     return regex
-  }
-  catch (error) {
+  } catch (error) {
     logger.warn('Invalid custom pattern for:', name, '→', pattern)
     logger.debug('Pattern validation error:', error)
     logger.info('Using default pattern for:', name)
