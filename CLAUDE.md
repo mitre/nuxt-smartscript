@@ -6,6 +6,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Nuxt SmartScript is a Nuxt 3 module that performs automatic typography transformations in the browser. It transforms patterns like (TM) → ™, ordinals (1st, 2nd), chemical formulas (H2O), and mathematical notation (x^2, x_n) using client-side DOM manipulation.
 
+**Current Version**: 0.3.0 (broken) → 0.3.1 (ready for release)
+
+## Critical Implementation Details
+
+### Hybrid Element Approach (v0.3.1+)
+- **SPAN elements**: Used for TM/R symbols - allows CSS `position: relative` control
+- **SUP/SUB elements**: Used for math/chemicals - semantic HTML
+- **Why**: Browser limitation - SUP/SUB elements ignore `position: relative`
+
+## Build System
+
+This module uses **@nuxt/module-builder** - the official Nuxt module build system. This provides:
+- **Automatic type generation** for `#imports` and other virtual modules
+- **Stub builds** for faster development iteration
+- **Proper TypeScript configuration** that extends `.nuxt/tsconfig.json`
+- **Compatibility** with the Nuxt ecosystem standards
+
+### Why Module Builder?
+Before adopting module-builder, we struggled with TypeScript errors for virtual modules like `#imports`. The module-builder solves this by:
+1. Generating proper type definitions in `.nuxt/` directory
+2. Providing the `dev:prepare` script that creates stubs and types
+3. Ensuring our module follows Nuxt best practices
+4. Handling the complex build pipeline automatically
+
 ## Commands
 
 ### Development
@@ -13,31 +37,34 @@ Nuxt SmartScript is a Nuxt 3 module that performs automatic typography transform
 # Install dependencies
 pnpm install
 
+# Prepare development environment (IMPORTANT: Run this first!)
+# This generates .nuxt/tsconfig.json with proper types
+pnpm dev:prepare
+
 # Run development playground
 pnpm dev
 
 # Build module for production
 pnpm prepack
-
-# Prepare development environment (stub builds)
-pnpm dev:prepare
 ```
 
 ### Testing
 ```bash
-# Run all tests
+# Run all tests (227 tests across all categories)
 pnpm test
 
 # Run tests in watch mode
 pnpm test:watch
 
-# Run a specific test file
-pnpm test typography
-pnpm test edge-cases
-pnpm test integration
+# Run specific test categories
+npx vitest run test/unit
+npx vitest run test/integration
+npx vitest run test/e2e
+npx vitest run test/performance
+npx vitest run test/unit/regression
 
-# Check for test failures
-pnpm test 2>&1 | grep "×"
+# Run specific test file
+npx vitest run positioning.test.ts
 
 # Type checking
 pnpm test:types
@@ -76,6 +103,20 @@ pnpm release
 - **Use conventional commits**: `feat:`, `fix:`, `test:`, `docs:`, `chore:`
 - **Commit signatures**: Use `Authored by: Aaron Lippold<lippold@gmail.com>`
 - **NO Claude signatures** in commits
+
+## Test Structure
+
+```
+test/
+├── unit/              # Unit tests for individual functions
+│   └── regression/    # Regression tests for fixed bugs
+├── integration/       # Integration tests (JSDOM)
+├── e2e/              # End-to-end tests (Playwright/real browser)
+├── performance/      # Performance benchmarks
+├── helpers/          # Test utilities and setup
+├── fixtures/         # Test fixtures for E2E
+└── docs/            # Test documentation
+```
 
 ## Architecture
 
@@ -159,14 +200,20 @@ export default defineNuxtConfig({
 
 ## Testing Approach
 
-Tests are organized into:
-- `test/typography.test.ts` - Pattern matching tests
-- `test/edge-cases.test.ts` - Boundary conditions (41 tests)
-- `test/integration.test.ts` - Full pipeline tests
-- `test/math-notation.test.ts` - Math pattern specifics
-- `test/basic.test.ts` - Module loading test
+Tests use Vitest with environment-specific configurations:
+- **Unit tests**: JSDOM environment, fast execution
+- **Integration tests**: JSDOM with full processing pipeline
+- **E2E tests**: Real browser with Playwright, tests actual DOM behavior
+- **Performance tests**: Benchmarks for processing speed
+- **Regression tests**: Ensure fixed bugs don't reappear
 
-All 91 tests must pass before committing.
+Test helpers in `test/helpers/setup.ts` provide utilities:
+- `setupDOM()` / `cleanupDOM()` - JSDOM management
+- `createTestElement()` - Test element creation
+- `createTestConfig()` - Config generation
+- `countTransformedElements()` - Verification helpers
+
+All 227 tests must pass before committing.
 
 ## Key Technical Considerations
 
@@ -176,6 +223,8 @@ All 91 tests must pass before committing.
 4. **DOM Safety**: Use TreeWalker and document fragments, never innerHTML
 5. **Exclusions**: Respect `no-superscript` class and `data-no-superscript` attribute
 6. **Content Detection**: Check for actual text changes, not just element type changes
+7. **Browser Limitations**: SUP/SUB elements don't respect `position: relative` - use SPAN for positioned elements
+8. **CSS Variables**: Applied via plugin at runtime, customizable per project
 
 ## Common Issues and Solutions
 
@@ -216,5 +265,12 @@ The module is configured for npm publishing:
 - Entry: `dist/module.mjs`
 - Types: `dist/types.d.mts`
 - Build: `pnpm prepack`
-- Version: 0.1.0 (beta)
+- Current Version: 0.3.0 (has critical bugs)
+- Next Version: 0.3.1 (fixes all v0.3.0 issues)
 - License: Apache-2.0
+
+### v0.3.1 Critical Fixes
+- Fixed config merging to include all properties (cssVariables were missing)
+- Implemented hybrid element approach (SPAN for TM/R, SUP/SUB for others)
+- Fixed registered symbol to use superscript
+- Updated all tests for new element types

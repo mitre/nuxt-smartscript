@@ -124,18 +124,23 @@ We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for de
 
 ### Development
 
+This module is built using [@nuxt/module-builder](https://github.com/nuxt/module-builder) for proper TypeScript support and Nuxt ecosystem compatibility.
+
 ```bash
 # Install dependencies
 pnpm install
+
+# Prepare development (generates types and stubs)
+pnpm dev:prepare
+
+# Run development playground
+pnpm dev
 
 # Run tests
 pnpm test
 
 # Build module
 pnpm prepack
-
-# Run playground
-pnpm dev
 
 # Lint code
 pnpm lint

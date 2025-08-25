@@ -3,7 +3,6 @@
  */
 
 import type { SuperscriptConfig } from '../smartscript/types'
-// @ts-expect-error - #imports is a virtual module
 import { useNuxtApp } from '#imports'
 import { onMounted, ref } from 'vue'
 

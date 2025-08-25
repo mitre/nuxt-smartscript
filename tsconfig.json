@@ -1,32 +1,9 @@
 {
+  "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "types": [
-      "node",
-      "vitest/globals"
-    ],
     "strict": true,
-    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": [
-    "src/**/*",
-    "test/**/*",
-    "playground/**/*"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules",
-    ".nuxt",
-    "docs"
-  ]
+    "noImplicitAny": true
+  }
 }

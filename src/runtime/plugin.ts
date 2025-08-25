@@ -4,7 +4,6 @@
  */
 
 import type { SuperscriptConfig } from './smartscript'
-// @ts-expect-error - #imports is a virtual module
 import { defineNuxtPlugin } from '#imports'
 import {
   createCombinedPattern,
@@ -26,7 +25,6 @@ class SmartScriptError extends Error {
   }
 }
 
-// @ts-expect-error - nuxtApp type is inferred from defineNuxtPlugin
 export default defineNuxtPlugin((nuxtApp) => {
   // Initialize configuration
   let config: SuperscriptConfig
