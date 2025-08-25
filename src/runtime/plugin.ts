@@ -4,7 +4,7 @@
  */
 
 import type { SuperscriptConfig } from './smartscript'
-import { defineNuxtPlugin } from '#imports'
+import { defineNuxtPlugin, nextTick } from '#imports'
 import {
   createCombinedPattern,
   createContentObserver,
@@ -153,18 +153,52 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   })
 
-  // Handle navigation
-  nuxtApp.hook('page:finish', () => {
+  // Handle navigation - use multiple hooks to ensure we catch all navigation scenarios
+  nuxtApp.hook('page:finish', async () => {
+    logger.debug('page:finish hook - navigation detected')
+
     initializeForNavigation()
-    setTimeout(process, 100)
+
+    // Recreate patterns in case something changed
+    patterns = createPatterns(config)
+    combinedPattern = createCombinedPattern(patterns, config)
+
+    // Wait for Vue to finish its virtual DOM reconciliation
+    await nextTick()
+
+    // Add a small delay to ensure all Vue updates are complete
+    setTimeout(() => {
+      logger.debug('Processing after navigation and Vue reconciliation')
+      process()
+    }, 50)
+  })
+
+  // Also hook into page:transition:finish for when transitions are used
+  nuxtApp.hook('page:transition:finish', () => {
+    logger.debug('page:transition:finish hook - processing after transition')
+    // Process immediately since transition is complete
+    process()
   })
 
   // Also hook into router if available
   if (nuxtApp.$router && typeof nuxtApp.$router === 'object' && 'afterEach' in nuxtApp.$router) {
     const router = nuxtApp.$router as { afterEach: (cb: () => void) => void }
-    router.afterEach(() => {
+    router.afterEach(async () => {
+      logger.debug('Router afterEach - navigation detected')
+
       initializeForNavigation()
-      setTimeout(process, 150)
+
+      // Recreate patterns here too
+      patterns = createPatterns(config)
+      combinedPattern = createCombinedPattern(patterns, config)
+
+      // Wait for Vue's virtual DOM to finish updating
+      await nextTick()
+
+      setTimeout(() => {
+        logger.debug('Processing after router navigation and Vue reconciliation')
+        process()
+      }, 100)
     })
   }
 

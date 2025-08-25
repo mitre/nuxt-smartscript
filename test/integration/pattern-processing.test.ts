@@ -176,8 +176,8 @@ describe('pattern Processing Pipeline', () => {
     it('should respect disabled ordinals', () => {
       const customConfig = {
         ...config,
-        symbols: {
-          ...config.symbols,
+        transformations: {
+          ...config.transformations,
           ordinals: false,
         },
       }
@@ -188,6 +188,7 @@ describe('pattern Processing Pipeline', () => {
       const text = '1st place winner gets H2O and Product(TM)'
       const matches = text.match(combined)
 
+      // When ordinals are disabled, '1st' should not be matched
       expect(matches).not.toContain('1st')
       expect(matches).toContain('H2')
       expect(matches).toContain('(TM)')

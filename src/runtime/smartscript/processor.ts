@@ -11,8 +11,12 @@ const textResultCache = new Map<string, TextPart[]>()
 const MAX_CACHE_SIZE = 1000
 
 function getCachedOrProcess(text: string, pattern: RegExp): TextPart[] {
+  // Create cache key that includes both text AND pattern
+  // This ensures different patterns get different cache entries
+  const cacheKey = `${text}::${pattern.source}`
+
   // Check cache first
-  const cached = textResultCache.get(text)
+  const cached = textResultCache.get(cacheKey)
   if (cached) {
     logger.trace('Cache hit for text:', text.substring(0, 20))
     return cached
@@ -30,7 +34,7 @@ function getCachedOrProcess(text: string, pattern: RegExp): TextPart[] {
     }
   }
 
-  textResultCache.set(text, result)
+  textResultCache.set(cacheKey, result)
   return result
 }
 
@@ -201,10 +205,10 @@ function processTextInternal(text: string, pattern: RegExp): TextPart[] {
   let lastIndex = 0
   let match: RegExpExecArray | null
 
-  // Reset pattern to ensure clean state
-  pattern.lastIndex = 0
+  // Create a fresh pattern to avoid state issues with global regex
+  const execPattern = new RegExp(pattern.source, pattern.flags)
 
-  while ((match = pattern.exec(text)) !== null) {
+  while ((match = execPattern.exec(text)) !== null) {
     const matchedText = match[0]
 
     // Special handling for H1-H6 patterns - skip if standalone (not followed by uppercase)
@@ -216,7 +220,7 @@ function processTextInternal(text: string, pattern: RegExp): TextPart[] {
         // Standalone H1-H6 - skip this match entirely
         logger.trace('Skipping standalone H1-H6 pattern:', matchedText)
         // Move the pattern's lastIndex forward to skip this match
-        pattern.lastIndex = match.index + 1
+        execPattern.lastIndex = match.index + 1
         continue
       }
     }
@@ -260,11 +264,11 @@ export function processText(text: string, pattern: RegExp): TextPart[] {
  * Check if text needs processing
  */
 export function needsProcessing(text: string, pattern: RegExp): boolean {
-  // Reset pattern to ensure clean state
-  pattern.lastIndex = 0
-  const result = pattern.test(text)
-  pattern.lastIndex = 0
-  return result
+  // Create a new regex from the pattern to avoid state issues
+  // This is necessary because the combined pattern has multiple capture groups
+  // and the global flag can cause state corruption when used repeatedly
+  const testPattern = new RegExp(pattern.source, pattern.flags)
+  return testPattern.test(text)
 }
 
 /**

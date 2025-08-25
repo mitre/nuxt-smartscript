@@ -155,18 +155,33 @@ export function createPatterns(config: SuperscriptConfig): PatternSet {
 /**
  * Create combined pattern for efficient matching
  */
-export function createCombinedPattern(patterns: PatternSet, config: SuperscriptConfig): RegExp {
-  const sources = [
-    patterns.trademark.source,
-    patterns.registered.source,
-    patterns.copyright.source,
-    config.symbols.ordinals ? patterns.ordinals.source : null,
-    patterns.chemicals.source,
-    patterns.mathSuper.source,
-    patterns.mathSub.source,
-  ].filter(Boolean)
+export function createCombinedPattern(patterns: PatternSet, _config: SuperscriptConfig): RegExp {
+  const sources = []
 
-  return new RegExp(sources.join('|'), 'g')
+  // Only include patterns that are actually enabled
+  // The patterns object already has NEVER_MATCH (\\b\\B) for disabled transformations
+  if (patterns.trademark.source !== '\\b\\B')
+    sources.push(patterns.trademark.source)
+  if (patterns.registered.source !== '\\b\\B')
+    sources.push(patterns.registered.source)
+  if (patterns.copyright.source !== '\\b\\B')
+    sources.push(patterns.copyright.source)
+  if (patterns.ordinals.source !== '\\b\\B')
+    sources.push(patterns.ordinals.source)
+  if (patterns.chemicals.source !== '\\b\\B')
+    sources.push(patterns.chemicals.source)
+  if (patterns.mathSuper.source !== '\\b\\B')
+    sources.push(patterns.mathSuper.source)
+  if (patterns.mathSub.source !== '\\b\\B')
+    sources.push(patterns.mathSub.source)
+
+  // If no patterns enabled, return a never-match pattern
+  if (sources.length === 0) {
+    return /\b\B/g
+  }
+
+  const combinedSource = sources.join('|')
+  return new RegExp(combinedSource, 'g')
 }
 
 /**

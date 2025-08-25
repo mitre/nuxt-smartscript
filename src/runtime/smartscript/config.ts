@@ -3,6 +3,7 @@
  */
 
 import type { SuperscriptConfig } from './types'
+import { SHARED_DEFAULTS } from '../shared-defaults'
 
 /**
  * CSS class names used by SmartScript (not configurable)
@@ -17,69 +18,9 @@ export const CSS_CLASSES = {
 } as const
 
 /**
- * Default configuration values
+ * Default configuration values - uses SHARED_DEFAULTS as single source of truth
  */
-export const DEFAULT_CONFIG: SuperscriptConfig = {
-  symbols: {
-    trademark: ['™', '(TM)'], // Not standalone 'TM'
-    registered: ['®', '(R)'],
-    copyright: ['©', '(C)'],
-    ordinals: true,
-  },
-  selectors: {
-    include: [
-      'main',
-      'article',
-      '.content',
-      '[role="main"]',
-      '.prose',
-      '.blog-post',
-      '.blog-content',
-      'section',
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'header',
-    ],
-    exclude: [
-      'pre',
-      'code',
-      'script',
-      'style',
-      '.no-superscript',
-      '[data-no-superscript]',
-      // Exclude our own generated elements
-      'sup.ss-sup',
-      'sub.ss-sub',
-    ],
-  },
-  performance: {
-    debounce: 100,
-    batchSize: 50,
-    delay: 1500,
-  },
-  positioning: {
-    trademark: {
-      body: '-0.5em',
-      headers: '-0.7em',
-      fontSize: '0.8em',
-    },
-    registered: {
-      body: '-0.25em',
-      headers: '-0.45em',
-      fontSize: '0.8em',
-    },
-    ordinals: {
-      fontSize: '0.75em',
-    },
-    chemicals: {
-      fontSize: '0.75em',
-    },
-  },
-}
+export const DEFAULT_CONFIG: SuperscriptConfig = SHARED_DEFAULTS as SuperscriptConfig
 
 /**
  * Merge user configuration with defaults
@@ -108,8 +49,13 @@ export function mergeConfig(
       ...userConfig.positioning,
     },
 
-    // Include all optional fields if provided
-    ...(userConfig.transformations && { transformations: userConfig.transformations }),
+    // Merge transformations with defaults
+    transformations: {
+      ...DEFAULT_CONFIG.transformations,
+      ...userConfig.transformations,
+    },
+
+    // Include optional fields if provided
     ...(userConfig.customPatterns && { customPatterns: userConfig.customPatterns }),
     ...(userConfig.cssVariables && { cssVariables: userConfig.cssVariables }),
   }

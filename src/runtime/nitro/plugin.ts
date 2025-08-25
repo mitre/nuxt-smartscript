@@ -5,6 +5,7 @@
 
 import type { NitroAppPlugin } from 'nitropack'
 import type { SuperscriptConfig } from '../smartscript/types'
+import { useRuntimeConfig } from '#imports'
 import { JSDOM } from 'jsdom'
 import { mergeConfig } from '../smartscript/config'
 import { processElement } from '../smartscript/engine'
@@ -14,9 +15,10 @@ import { createCombinedPattern, createPatterns } from '../smartscript/patterns'
 export default <NitroAppPlugin> function (nitro) {
   // Hook into the render:html event for both SSR and SSG
   // @ts-expect-error - render:html hook exists but not typed in nitropack
-  nitro.hooks.hook('render:html', (html: Record<string, string[]>, { event }: { event: { context: { $config?: { public?: { smartscript?: SuperscriptConfig } } } } }) => {
-    // Get configuration from runtime config
-    const config = event.context.$config?.public?.smartscript
+  nitro.hooks.hook('render:html', (html: Record<string, string[]>, { event: _event }: { event: any }) => {
+    // Get runtime config using useRuntimeConfig
+    const runtimeConfig = useRuntimeConfig()
+    const config = runtimeConfig.public?.smartscript as SuperscriptConfig
 
     // Skip if no config or SSR processing is disabled
     if (!config || config.ssr === false) {

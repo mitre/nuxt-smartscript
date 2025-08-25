@@ -72,3 +72,9 @@ session.md
 # Project-specific
 *.old.ts
 *.original.ts
+
+# Archive directory for recovery files
+archive/
+
+# Package tarball
+*.tgz

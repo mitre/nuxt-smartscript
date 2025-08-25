@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { setMockRuntimeConfig } from '../mocks/imports'
 
 // Mock Nitro types
 interface NitroApp {
@@ -11,8 +12,8 @@ describe('nitro SSR Plugin', () => {
   let nitroApp: NitroApp
   let renderHook: ((html: Record<string, unknown[]>, context: { event: Record<string, unknown> }) => void) | null = null
 
-  // Helper to create mock event with config
-  const createMockEvent = (configOverrides?: Record<string, unknown>) => {
+  // Helper to set runtime config
+  const setRuntimeConfig = (configOverrides?: Record<string, unknown>) => {
     const defaultConfig = {
       debug: false,
       ssr: true,
@@ -44,21 +45,30 @@ describe('nitro SSR Plugin', () => {
       },
     }
 
-    return {
-      context: {
-        $config: {
-          public: {
-            smartscript: mergedConfig,
-          },
-        },
+    // Set the mock runtime config using the helper
+    setMockRuntimeConfig({
+      public: {
+        smartscript: mergedConfig,
       },
+    })
+
+    return mergedConfig
+  }
+
+  // Helper to create mock event (still needed for the hook signature)
+  const createMockEvent = () => {
+    return {
+      context: {},
     }
   }
 
   // Helper to execute render hook
   const executeRenderHook = (html: Record<string, unknown[]>, configOverrides?: Record<string, unknown>) => {
+    // Set the runtime config before executing
+    setRuntimeConfig(configOverrides)
+
     if (renderHook) {
-      renderHook(html, { event: createMockEvent(configOverrides) })
+      renderHook(html, { event: createMockEvent() })
     }
   }
 
@@ -73,6 +83,9 @@ describe('nitro SSR Plugin', () => {
         }),
       },
     }
+
+    // Set default runtime config
+    setRuntimeConfig()
 
     // Reset mocks and module cache
     vi.clearAllMocks()
@@ -163,21 +176,56 @@ describe('nitro SSR Plugin', () => {
       expect(body).toContain('>2</sub>O</p>')
     })
 
-    it('should add processing flag to body', async () => {
+    it('should add processing marker to head', async () => {
       const inputHtml = {
-        body: ['<p>Test</p>'],
+        body: ['<p>Product(TM)</p>'],
         head: [],
         bodyAppend: [],
         bodyPrepend: [],
         htmlAttrs: [],
-        bodyAttrs: ['data-superscript-processed="true"'],
+        bodyAttrs: [],
       }
 
       // Execute render hook
       executeRenderHook(inputHtml)
 
-      // Check that flag was added
-      expect(inputHtml.bodyAttrs).toContain('data-superscript-processed="true"')
+      // Check that marker was added to head
+      expect(inputHtml.head).toContain('<meta name="smartscript-processed" content="true">')
+    })
+
+    it('should skip processing when SSR is disabled', async () => {
+      const inputHtml = {
+        body: ['<p>Product(TM) H2O</p>'],
+        head: [],
+        bodyAppend: [],
+        bodyPrepend: [],
+        htmlAttrs: [],
+        bodyAttrs: [],
+      }
+
+      // Execute with SSR disabled
+      executeRenderHook(inputHtml, { ssr: false })
+
+      // Nothing should be transformed
+      expect(inputHtml.body[0]).toBe('<p>Product(TM) H2O</p>')
+      expect(inputHtml.head).toEqual([])
+    })
+
+    it('should skip already processed content', async () => {
+      const inputHtml = {
+        body: ['<p>Product(TM)</p>'],
+        head: ['<meta name="smartscript-processed" content="true">'],
+        bodyAppend: [],
+        bodyPrepend: [],
+        htmlAttrs: [],
+        bodyAttrs: [],
+      }
+
+      // Execute render hook
+      executeRenderHook(inputHtml)
+
+      // Content should not be reprocessed
+      expect(inputHtml.body[0]).toBe('<p>Product(TM)</p>')
     })
 
     it('should handle multiple body sections', async () => {
@@ -226,6 +274,32 @@ describe('nitro SSR Plugin', () => {
   })
 
   describe('configuration handling', () => {
+    it('should add CSS variables when configured', async () => {
+      const inputHtml = {
+        body: ['<p>Product(TM)</p>'],
+        head: [],
+        bodyAppend: [],
+        bodyPrepend: [],
+        htmlAttrs: [],
+        bodyAttrs: [],
+      }
+
+      // Execute with CSS variables
+      executeRenderHook(inputHtml, {
+        cssVariables: {
+          'tm-size': '0.7em',
+          'reg-size': '0.7em',
+          'ordinal-size': '0.8em',
+        },
+      })
+
+      // Check that CSS variables were added to head
+      const hasStyleTag = inputHtml.head.some((item: unknown) =>
+        typeof item === 'string' && item.includes('<style>:root { --ss-tm-size: 0.7em; --ss-reg-size: 0.7em; --ss-ordinal-size: 0.8em; }</style>'),
+      )
+      expect(hasStyleTag).toBe(true)
+    })
+
     it('should respect disabled transformations', async () => {
       const inputHtml = {
         body: ['<p>Product(TM) H2O</p>'],
@@ -237,7 +311,7 @@ describe('nitro SSR Plugin', () => {
       }
 
       // Execute with trademark disabled but chemicals enabled
-      const mockEvent = createMockEvent({
+      const config = setRuntimeConfig({
         transformations: {
           trademark: false,
           registered: false,
@@ -249,13 +323,12 @@ describe('nitro SSR Plugin', () => {
       })
 
       // Verify our mock config is correct
-      const config = mockEvent.context.$config.public.smartscript
       expect(config.transformations.trademark).toBe(false)
       expect(config.transformations.chemicals).toBe(true)
 
       // Execute render hook
       if (renderHook) {
-        renderHook(inputHtml, { event: mockEvent })
+        renderHook(inputHtml, { event: createMockEvent() })
       }
 
       // Trademark should not be transformed

@@ -23,7 +23,11 @@ export function processTextNode(
 ): boolean {
   const text = textNode.textContent || ''
 
-  if (!text.trim() || !needsProcessing(text, pattern)) {
+  if (!text.trim()) {
+    return false
+  }
+
+  if (!needsProcessing(text, pattern)) {
     return false
   }
 
@@ -71,6 +75,8 @@ function createTextNodeFilter(
       }
 
       // Skip if parent is one of our generated elements (including from SSR)
+      // But only skip if this is the direct text content of that element
+      // Don't skip sibling text nodes
       if (parent && (
         parent.classList.contains('ss-tm')
         || parent.classList.contains('ss-reg')
@@ -79,10 +85,8 @@ function createTextNodeFilter(
         || parent.classList.contains('ss-ordinal')
         || parent.classList.contains('ss-chemical')
         || parent.classList.contains('ss-math')
-        || (parent.tagName === 'SUP' && parent.className.includes('ss-'))
-        || (parent.tagName === 'SUB' && parent.className.includes('ss-'))
-        || (parent.tagName === 'SPAN' && parent.className.includes('ss-'))
       )) {
+        // This is the actual transformed content, skip it
         return NodeFilter.FILTER_REJECT
       }
 

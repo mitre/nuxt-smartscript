@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { addPlugin, addServerPlugin, createResolver, defineNuxtModule } from '@nuxt/kit'
+import { SHARED_DEFAULTS } from './runtime/shared-defaults'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
@@ -117,72 +118,8 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
 
-  // Default configuration options
-  defaults: {
-    enabled: true,
-    positioning: {
-      trademark: {
-        body: '-0.5em',
-        headers: '-0.7em',
-        fontSize: '0.8em',
-      },
-      registered: {
-        body: '-0.25em',
-        headers: '-0.45em',
-        fontSize: '0.8em',
-      },
-      ordinals: {
-        fontSize: '0.75em',
-      },
-      chemicals: {
-        fontSize: '0.75em',
-      },
-    },
-    selectors: {
-      include: [
-        'main',
-        'article',
-        '.content',
-        '[role="main"]',
-        '.prose',
-        '.blog-post',
-        '.blog-content',
-        'section',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'header',
-      ],
-      exclude: [
-        'pre',
-        'code',
-        'script',
-        'style',
-        '.no-superscript',
-        '[data-no-superscript]',
-      ],
-    },
-    performance: {
-      debounce: 100,
-      batchSize: 50,
-      delay: 1500,
-    },
-    transformations: {
-      trademark: true,
-      registered: true,
-      copyright: true,
-      ordinals: true,
-      chemicals: true,
-      mathSuper: true,
-      mathSub: true,
-    },
-    ssr: true,
-    client: true,
-    debug: false,
-  },
+  // Default configuration options - SINGLE SOURCE OF TRUTH
+  defaults: SHARED_DEFAULTS,
 
   setup(options, nuxt) {
     if (!options.enabled) {

@@ -36,6 +36,7 @@ export default defineConfig({
     alias: {
       '~': fileURLToPath(new URL('./src', import.meta.url)),
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '#imports': fileURLToPath(new URL('./test/mocks/imports.ts', import.meta.url)),
     },
   },
 })
