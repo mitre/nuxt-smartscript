@@ -17,10 +17,12 @@ Smart typography transformations for Nuxt - automatic superscript, subscript, an
 - 🔢 **Ordinal Numbers** - 1st, 2nd, 3rd with proper superscript
 - 🧪 **Chemical Formulas** - H2O, CO2 with subscripts
 - 📐 **Mathematical Notation** - x^2 superscript, x_1 subscript
-- ⚡ **Performance Optimized** - Debounced processing, batch updates
-- 🎨 **Fully Customizable** - Adjust positioning for different fonts
+- 🚀 **Full SSR/SSG Support** - Server-side rendering and static generation (v0.4.0+)
+- 🎯 **30+ HTML Elements** - Headings, paragraphs, lists, tables, links, and more
+- ⚡ **Performance Optimized** - Debounced processing, batch updates, caching
+- 🎨 **Fully Customizable** - CSS variables and configurable selectors
 - ♿ **Accessible** - Proper ARIA labels for screen readers
-- 🔧 **TypeScript Support** - Full type safety
+- 🔧 **TypeScript Support** - Full type safety with module builder
 
 ## Quick Setup
 

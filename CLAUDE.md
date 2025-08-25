@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Nuxt SmartScript is a Nuxt 3 module that performs automatic typography transformations in the browser. It transforms patterns like (TM) → ™, ordinals (1st, 2nd), chemical formulas (H2O), and mathematical notation (x^2, x_n) using client-side DOM manipulation.
+Nuxt SmartScript is a Nuxt 3 module that performs automatic typography transformations both server-side and client-side. It transforms patterns like (TM) → ™, ordinals (1st, 2nd), chemical formulas (H2O), and mathematical notation (x^2, x_n) using DOM manipulation.
 
-**Current Version**: 0.3.0 (broken) → 0.3.1 (ready for release)
+**Current Version**: 0.3.0 → 0.4.0 (ready for release with SSR support)
 
 ## Critical Implementation Details
 
@@ -50,7 +50,7 @@ pnpm prepack
 
 ### Testing
 ```bash
-# Run all tests (227 tests across all categories)
+# Run all tests (258 tests across all categories)
 pnpm test
 
 # Run tests in watch mode
@@ -213,7 +213,7 @@ Test helpers in `test/helpers/setup.ts` provide utilities:
 - `createTestConfig()` - Config generation
 - `countTransformedElements()` - Verification helpers
 
-All 227 tests must pass before committing.
+All 258 tests must pass before committing.
 
 ## Key Technical Considerations
 
@@ -265,12 +265,14 @@ The module is configured for npm publishing:
 - Entry: `dist/module.mjs`
 - Types: `dist/types.d.mts`
 - Build: `pnpm prepack`
-- Current Version: 0.3.0 (has critical bugs)
-- Next Version: 0.3.1 (fixes all v0.3.0 issues)
+- Current Version: 0.3.0
+- Next Version: 0.4.0 (SSR support, expanded selectors)
 - License: Apache-2.0
 
-### v0.3.1 Critical Fixes
-- Fixed config merging to include all properties (cssVariables were missing)
-- Implemented hybrid element approach (SPAN for TM/R, SUP/SUB for others)
-- Fixed registered symbol to use superscript
-- Updated all tests for new element types
+### v0.4.0 Major Improvements
+- Full SSR/SSG support using jsdom in nitro plugin
+- Expanded selector coverage (30+ HTML elements)
+- Fixed navigation bug (missing selectors like p, li, td, th)
+- DRY improvement with shared-defaults.ts
+- Fixed runtime config access with useRuntimeConfig from #imports
+- All 258 tests passing
