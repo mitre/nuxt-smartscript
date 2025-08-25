@@ -12,6 +12,10 @@ export default defineNuxtConfig({
     // Enable/disable the plugin
     enabled: true,
     
+    // SSR/SSG configuration (v0.4.0+)
+    ssr: true,        // Enable server-side rendering
+    client: true,     // Enable client-side processing
+    
     // Customize positioning (in em units)
     positioning: {
       trademark: {
@@ -231,56 +235,29 @@ The plugin uses the following default CSS classes:
 | Ordinal | `ss-sup` | `ss-ordinal` | Ordinal numbers (1st, 2nd, etc.) |
 | Math | `ss-sup` or `ss-sub` | `ss-math` | Math notation (x^2, x_1) |
 
-### Custom Class Names
+### Working with CSS Classes
 
-You can customize the CSS class names used by the plugin in your `nuxt.config.ts`:
-
-```typescript
-export default defineNuxtConfig({
-  smartscript: {
-    cssClasses: {
-      superscript: 'my-sup',
-      subscript: 'my-sub',
-      trademark: 'tm-mark',
-      registered: 'reg-mark',
-      ordinal: 'ord-num',
-      math: 'math-notation'
-    }
-  }
-})
-```
-
-When using custom classes, remember to update your CSS accordingly:
+The default CSS classes can be targeted in your stylesheets:
 
 ```css
-/* Custom styles for your custom classes */
-sup.my-sup {
-  vertical-align: super;
-  font-size: 0.75em;
-}
-
-sup.my-sup.tm-mark {
-  /* Trademark specific styles */
-}
-
-sub.my-sub {
-  vertical-align: sub;
-  font-size: 0.75em;
-}
+/* Target specific element types */
+.ss-sup.ss-tm { /* Trademark symbols */ }
+.ss-sup.ss-reg { /* Registered symbols */ }
+.ss-sup.ss-ordinal { /* Ordinal numbers */ }
+.ss-sup.ss-math { /* Math superscripts */ }
+.ss-sub.ss-math { /* Math subscripts */ }
+.ss-sub { /* Chemical formulas and subscripts */ }
 ```
 
-### Accessing CSS Classes in Code
+### Finding Elements in JavaScript
 
-```typescript
-import { CSS_CLASSES } from '@mitre/nuxt-smartscript'
-
-// These will reflect your custom classes if configured
-console.log(CSS_CLASSES.superscript)  // 'my-sup' (or 'ss-sup' if not customized)
-console.log(CSS_CLASSES.subscript)    // 'my-sub' (or 'ss-sub' if not customized)
-console.log(CSS_CLASSES.trademark)    // 'tm-mark' (or 'ss-tm' if not customized)
-console.log(CSS_CLASSES.registered)   // 'reg-mark' (or 'ss-reg' if not customized)
-console.log(CSS_CLASSES.ordinal)      // 'ord-num' (or 'ss-ordinal' if not customized)
-console.log(CSS_CLASSES.math)         // 'math-notation' (or 'ss-math' if not customized)
+```javascript
+// Find all transformed elements
+const trademarks = document.querySelectorAll('.ss-tm')
+const registered = document.querySelectorAll('.ss-reg')
+const ordinals = document.querySelectorAll('.ss-ordinal')
+const mathElements = document.querySelectorAll('.ss-math')
+const subscripts = document.querySelectorAll('.ss-sub')
 ```
 
 ## CSS Customization

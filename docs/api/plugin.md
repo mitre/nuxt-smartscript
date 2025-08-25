@@ -1,6 +1,6 @@
 # Plugin API
 
-The SmartScript plugin provides a comprehensive API accessible through the Nuxt app instance.
+The SmartScript plugin provides methods for controlling typography transformations in your Nuxt application.
 
 ## Accessing the Plugin
 
@@ -8,409 +8,316 @@ The SmartScript plugin provides a comprehensive API accessible through the Nuxt 
 const { $smartscript } = useNuxtApp()
 ```
 
-## Available Methods
+## Core Methods
 
-### `process()`
+### `processAll()`
 
-Manually trigger processing of all content.
+Process all content on the page.
 
 ```javascript
-$smartscript.process()
+$smartscript.processAll()
 ```
 
 **Use Cases:**
 - After dynamically loading content
-- After changing configuration
-- When content visibility changes
+- When enabling SmartScript after disabling
+- After route changes
 
-### `startObserving()`
+### `processElement(element)`
 
-Start the MutationObserver to watch for DOM changes.
-
-```javascript
-$smartscript.startObserving()
-```
-
-**Note:** The observer starts automatically on mount. Use this only if you've previously stopped it.
-
-### `stopObserving()`
-
-Stop watching for DOM changes.
+Process a specific element and its children.
 
 ```javascript
-$smartscript.stopObserving()
-```
-
-**Use Cases:**
-- Temporarily disable processing during heavy DOM operations
-- Clean up when component unmounts
-- Improve performance during animations
-
-### `getConfig()`
-
-Get the current configuration.
-
-```javascript
-const config = $smartscript.getConfig()
-console.log('Current config:', config)
-```
-
-**Returns:** `SuperscriptConfig` object
-
-### `updateConfig(newConfig)`
-
-Update configuration at runtime.
-
-```javascript
-$smartscript.updateConfig({
-  symbols: {
-    ordinals: false
-  },
-  positioning: {
-    trademark: {
-      body: '-0.6em'
-    }
-  }
-})
+const element = document.querySelector('.content')
+$smartscript.processElement(element)
 ```
 
 **Parameters:**
-- `newConfig: Partial<SuperscriptConfig>` - Configuration changes to apply
+- `element: Element` - DOM element to process
 
-**Returns:** `boolean` - Success status
+**Use Cases:**
+- Process newly added content
+- Target specific sections
+- Optimize performance by processing only what's needed
 
-### `reset()`
+### `refresh()`
 
-Reset all processing and restart the observer.
-
-```javascript
-$smartscript.reset()
-```
-
-**What it does:**
-1. Stops the observer
-2. Clears all processing flags
-3. Restarts the observer
-4. Reprocesses all content
-
-### `getStats()`
-
-Get current processing statistics.
+Re-process all content (forces a complete reprocess).
 
 ```javascript
-const stats = $smartscript.getStats()
-console.log(`Processed ${stats.total} transformations`)
+$smartscript.refresh()
 ```
 
-**Returns:**
-```typescript
-{
-  processedElements: number  // Elements with data-superscript-processed
-  superscripts: number       // Count of .auto-super elements
-  subscripts: number         // Count of .auto-sub elements
-  total: number             // Total transformations
-}
+**Use Cases:**
+- After configuration changes
+- When content has been modified externally
+- To ensure consistency
+
+### `destroy()`
+
+Stop all processing and clean up resources.
+
+```javascript
+$smartscript.destroy()
 ```
 
-## Complete Example
+**Use Cases:**
+- Component cleanup
+- Before removing the module
+- Memory management
+
+## Usage Examples
+
+### Basic Usage
 
 ```vue
 <template>
-  <div class="plugin-api-demo">
-    <div class="controls">
-      <button @click="handleProcess">Process</button>
-      <button @click="handleToggleObserver">
-        {{ isObserving ? 'Stop' : 'Start' }} Observer
-      </button>
-      <button @click="handleReset">Reset</button>
-      <button @click="handleUpdateConfig">Update Config</button>
-    </div>
-    
-    <div class="stats">
-      <h3>Statistics</h3>
-      <pre>{{ JSON.stringify(stats, null, 2) }}</pre>
-    </div>
-    
-    <div class="config">
-      <h3>Current Config</h3>
-      <pre>{{ JSON.stringify(config, null, 2) }}</pre>
-    </div>
-    
-    <div class="content">
-      <p>Test content with (TM) and 1st ordinal.</p>
-      <p>Chemical: H2O, Math: x^2</p>
+  <div>
+    <button @click="processContent">Process Now</button>
+    <div ref="contentRef">
+      <p>Product(TM) is the 1st choice!</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-
 const { $smartscript } = useNuxtApp()
+const contentRef = ref(null)
 
-const stats = ref({})
-const config = ref({})
-const isObserving = ref(true)
-
-function updateStats() {
-  stats.value = $smartscript.getStats()
-}
-
-function updateConfig() {
-  config.value = $smartscript.getConfig()
-}
-
-function handleProcess() {
-  $smartscript.process()
-  updateStats()
-}
-
-function handleToggleObserver() {
-  if (isObserving.value) {
-    $smartscript.stopObserving()
-  } else {
-    $smartscript.startObserving()
-  }
-  isObserving.value = !isObserving.value
-}
-
-function handleReset() {
-  $smartscript.reset()
-  updateStats()
-}
-
-function handleUpdateConfig() {
-  const success = $smartscript.updateConfig({
-    positioning: {
-      trademark: {
-        body: '-0.7em'
-      }
-    }
-  })
+function processContent() {
+  // Process entire page
+  $smartscript.processAll()
   
-  if (success) {
-    updateConfig()
-    $smartscript.process()
-    updateStats()
+  // Or process specific element
+  if (contentRef.value) {
+    $smartscript.processElement(contentRef.value)
   }
 }
 
 onMounted(() => {
-  updateStats()
-  updateConfig()
+  // Initial processing
+  $smartscript.processAll()
 })
 
 onUnmounted(() => {
-  // Clean up
-  $smartscript.stopObserving()
+  // Cleanup
+  $smartscript.destroy()
 })
 </script>
 ```
 
-## Advanced Patterns
+### Dynamic Content
 
-### Performance Optimization
+```vue
+<script setup>
+const { $smartscript } = useNuxtApp()
 
-Batch operations for better performance:
-
-```javascript
-async function performHeavyOperation() {
-  const { $smartscript } = useNuxtApp()
-  
-  // Stop observing during heavy DOM manipulation
-  $smartscript.stopObserving()
-  
-  try {
-    // Perform multiple DOM operations
-    await updateContent()
-    await loadMoreItems()
-    await renderCharts()
-  } finally {
-    // Restart and process once
-    $smartscript.startObserving()
-    $smartscript.process()
-  }
-}
-```
-
-### Configuration Presets
-
-Create and apply configuration presets:
-
-```javascript
-const presets = {
-  minimal: {
-    symbols: {
-      trademark: ['™'],
-      registered: ['®'],
-      copyright: ['©'],
-      ordinals: false
-    },
-    performance: {
-      debounce: 300,
-      batchSize: 100
-    }
-  },
-  
-  full: {
-    symbols: {
-      trademark: ['™', '(TM)', 'TM'],
-      registered: ['®', '(R)'],
-      copyright: ['©', '(C)'],
-      ordinals: true
-    },
-    performance: {
-      debounce: 100,
-      batchSize: 50
-    }
-  }
-}
-
-function applyPreset(presetName) {
-  const { $smartscript } = useNuxtApp()
-  
-  if (presets[presetName]) {
-    $smartscript.updateConfig(presets[presetName])
-    $smartscript.process()
-  }
-}
-```
-
-### Dynamic Content Loading
-
-Handle content loaded via API:
-
-```javascript
-async function loadDynamicContent() {
-  const { $smartscript } = useNuxtApp()
-  
-  // Temporarily stop observing
-  $smartscript.stopObserving()
-  
+async function loadArticle(id) {
   // Load content
-  const response = await fetch('/api/articles')
-  const articles = await response.json()
+  const article = await $fetch(`/api/articles/${id}`)
+  content.value = article.html
   
-  // Render articles
-  renderArticles(articles)
-  
-  // Process new content
+  // Process after DOM update
   await nextTick()
-  $smartscript.process()
+  $smartscript.processAll()
+}
+</script>
+```
+
+### Selective Processing
+
+```vue
+<template>
+  <div>
+    <section v-for="section in sections" :key="section.id">
+      <div :id="section.id" v-html="section.content" />
+      <button @click="() => processSection(section.id)">
+        Process This Section
+      </button>
+    </section>
+  </div>
+</template>
+
+<script setup>
+const { $smartscript } = useNuxtApp()
+
+function processSection(sectionId) {
+  const element = document.getElementById(sectionId)
+  if (element) {
+    $smartscript.processElement(element)
+  }
+}
+</script>
+```
+
+## Performance Patterns
+
+### Batch Processing
+
+Process multiple updates at once:
+
+```javascript
+async function loadMultipleItems(ids) {
+  const { $smartscript } = useNuxtApp()
   
-  // Resume observing
-  $smartscript.startObserving()
+  // Load all items
+  const items = await Promise.all(
+    ids.map(id => $fetch(`/api/items/${id}`))
+  )
+  
+  // Update DOM
+  renderItems(items)
+  
+  // Single process call
+  await nextTick()
+  $smartscript.processAll()
 }
 ```
 
-### Monitoring Performance
+### Debounced Processing
 
-Track processing performance:
+For frequent updates:
 
 ```javascript
-function monitorPerformance() {
-  const { $smartscript } = useNuxtApp()
-  
-  const startTime = performance.now()
-  const startStats = $smartscript.getStats()
-  
-  $smartscript.process()
-  
-  const endTime = performance.now()
-  const endStats = $smartscript.getStats()
-  
-  console.log({
-    duration: endTime - startTime,
-    elementsProcessed: endStats.processedElements - startStats.processedElements,
-    transformations: endStats.total - startStats.total
-  })
-}
+import { debounce } from 'perfect-debounce'
+
+const { $smartscript } = useNuxtApp()
+
+const debouncedProcess = debounce(() => {
+  $smartscript.processAll()
+}, 200)
+
+// Use for rapid changes
+watch(content, () => {
+  debouncedProcess()
+})
 ```
 
-### Conditional Processing
+### Lazy Loading
 
-Process based on user preferences:
+Process content when it becomes visible:
 
 ```javascript
-function setupUserPreferences() {
-  const { $smartscript } = useNuxtApp()
-  const userPrefs = useUserPreferences()
-  
-  // Apply user preferences
-  $smartscript.updateConfig({
-    symbols: {
-      ordinals: userPrefs.value.enableOrdinals,
-      trademark: userPrefs.value.enableTrademark ? ['™', '(TM)'] : []
-    }
-  })
-  
-  // Watch for preference changes
-  watch(userPrefs, (newPrefs) => {
-    $smartscript.updateConfig({
-      symbols: {
-        ordinals: newPrefs.enableOrdinals
+import { useIntersectionObserver } from '@vueuse/core'
+
+const { $smartscript } = useNuxtApp()
+const sections = ref([])
+
+sections.value.forEach(section => {
+  useIntersectionObserver(
+    section.ref,
+    ([{ isIntersecting }]) => {
+      if (isIntersecting && !section.processed) {
+        $smartscript.processElement(section.ref.value)
+        section.processed = true
       }
-    })
-    $smartscript.process()
+    }
+  )
+})
+```
+
+## SSR Considerations
+
+With v0.4.0's SSR support:
+
+### Check for Server Processing
+
+```javascript
+onMounted(() => {
+  // Look for server-processed marker
+  const processed = document.querySelector('[data-smartscript-processed]')
+  
+  if (!processed) {
+    // Only process if not done server-side
+    const { $smartscript } = useNuxtApp()
+    $smartscript.processAll()
+  }
+})
+```
+
+### Client-Only Processing
+
+```javascript
+// Ensure client-side only
+if (process.client) {
+  onMounted(() => {
+    const { $smartscript } = useNuxtApp()
+    $smartscript.processAll()
   })
 }
 ```
 
 ## Error Handling
 
-The plugin includes built-in error handling:
+The plugin handles errors gracefully:
 
 ```javascript
-function safeProcess() {
-  const { $smartscript } = useNuxtApp()
-  
-  try {
-    $smartscript.process()
-    console.log('Processing successful')
-  } catch (error) {
-    console.error('SmartScript error:', error)
-    
-    // Attempt recovery
-    $smartscript.reset()
-  }
+try {
+  $smartscript.processAll()
+} catch (error) {
+  console.error('SmartScript processing failed:', error)
+  // Content remains unchanged on error
 }
 ```
 
 ## TypeScript Support
 
-For TypeScript projects, the plugin is fully typed:
+The plugin is fully typed:
 
 ```typescript
-declare module '#app' {
-  interface NuxtApp {
-    $smartscript: {
-      process: () => void
-      startObserving: () => void
-      stopObserving: () => void
-      getConfig: () => SuperscriptConfig
-      updateConfig: (config: Partial<SuperscriptConfig>) => boolean
-      reset: () => void
-      getStats: () => {
-        processedElements: number
-        superscripts: number
-        subscripts: number
-        total: number
-      }
-    }
-  }
+interface SmartScriptPlugin {
+  processAll(): void
+  processElement(element: Element): void
+  refresh(): void
+  destroy(): void
+}
+
+// Usage with TypeScript
+const { $smartscript } = useNuxtApp() as {
+  $smartscript: SmartScriptPlugin
 }
 ```
 
 ## Best Practices
 
-1. **Always clean up**: Stop the observer when components unmount
-2. **Batch operations**: Stop observer during multiple DOM changes
-3. **Use stats wisely**: Don't poll stats too frequently
-4. **Handle errors**: Wrap operations in try-catch for production
-5. **Test config changes**: Verify config updates return true
+1. **Process once**: Avoid calling `processAll()` repeatedly
+2. **Use selective processing**: Process only what's needed with `processElement()`
+3. **Clean up**: Call `destroy()` when appropriate
+4. **Handle timing**: Use `nextTick()` after DOM changes
+5. **Consider SSR**: Check if content was already processed server-side
+
+## Common Issues
+
+### Content Not Processing
+
+```javascript
+// Ensure DOM is ready
+await nextTick()
+
+// Check element exists
+const element = document.querySelector('.content')
+if (element) {
+  $smartscript.processElement(element)
+}
+
+// Verify not in exclusion zone
+// Not inside <pre>, <code>, or has .no-superscript class
+```
+
+### Processing Too Early
+
+```javascript
+// Wait for hydration in SSR apps
+onMounted(() => {
+  setTimeout(() => {
+    $smartscript.processAll()
+  }, 100)
+})
+```
 
 ## See Also
 
-- [Composables](/api/composables) - Vue composable wrapper
-- [Configuration](/api/configuration) - Configuration options
-- [Architecture](/architecture) - Internal implementation details
+- [Composables](/api/composables) - Additional API access patterns
+- [Configuration](/api/configuration) - Module configuration
+- [Vue Integration](/vue-integration) - Component integration patterns
+- [Deployment Modes](/guide/deployment-modes) - SSR vs Client setup

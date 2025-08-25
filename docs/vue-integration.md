@@ -1,476 +1,307 @@
 # Vue Integration
 
-This guide shows how to integrate @mitre/@mitre/nuxt-smartscript with your Vue components using the provided composable and API.
+Learn how to integrate @mitre/nuxt-smartscript with your Vue components.
 
-## Auto-Processing
+## Automatic Processing
 
-By default, @mitre/@mitre/nuxt-smartscript automatically processes your content without any component integration needed. The module will:
+By default, SmartScript works automatically without any integration:
 
-- Process content after app mount
-- Watch for DOM changes
-- Handle navigation between pages
-- Apply transformations to all configured selectors
+- Processes content after app mount
+- Watches for DOM changes via MutationObserver
+- Handles navigation between pages
+- Applies transformations based on your configuration
 
-## Using the Composable
+## Plugin API Access
 
-For more control, use the `useSmartScript` composable in your components:
-
-### Basic Usage
+Access SmartScript functionality in your components:
 
 ```vue
-<template>
-  <div>
-    <button @click="process">Reprocess Content</button>
-    <p>Transformations applied: {{ stats.total }}</p>
-    <p v-if="isProcessing">Processing...</p>
-  </div>
-</template>
-
 <script setup>
-const { process, stats, isProcessing } = useSmartScript()
+const { $smartscript } = useNuxtApp()
 
 // Manually trigger processing
-const handleContentChange = () => {
-  process()
+$smartscript.processAll()
+
+// Process specific element
+const element = document.querySelector('.content')
+if (element) {
+  $smartscript.processElement(element)
 }
 </script>
 ```
 
-### Available Methods and Properties
-
-```typescript
-const {
-  process,        // Function to trigger processing
-  stats,          // Reactive statistics object
-  isProcessing,   // Reactive processing state
-  config,         // Current configuration
-  updateConfig,   // Update configuration at runtime
-} = useSmartScript()
-```
-
-## Real-World Examples
+## Common Patterns
 
 ### Dynamic Content Loading
 
+Process content after AJAX/fetch operations:
+
 ```vue
 <template>
-  <div class="blog-post">
-    <article v-html="content" />
-    <div v-if="isProcessing" class="loading">
-      Applying typography transformations...
-    </div>
+  <div>
+    <article v-html="content" ref="articleRef" />
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-
-const { process, isProcessing } = useSmartScript()
+const { $smartscript } = useNuxtApp()
 const content = ref('')
+const articleRef = ref(null)
 
-// Fetch content from API
-async function loadContent() {
-  const response = await fetch('/api/posts/latest')
-  content.value = await response.text()
+async function loadArticle(id) {
+  const response = await fetch(`/api/articles/${id}`)
+  content.value = await response.json()
   
-  // Process after content loads
+  // Process after DOM update
   await nextTick()
-  process()
+  if (articleRef.value) {
+    $smartscript.processElement(articleRef.value)
+  }
 }
 
-onMounted(() => {
-  loadContent()
-})
+onMounted(() => loadArticle(1))
 </script>
 ```
 
-### Configuration Updates
+### Live Preview
+
+Create a live preview with transformations:
 
 ```vue
 <template>
-  <div class="settings">
-    <h3>Typography Settings</h3>
-    
-    <label>
-      <input type="checkbox" v-model="enableOrdinals">
-      Transform ordinals (1st, 2nd, 3rd)
-    </label>
-    
-    <label>
-      Trademark position:
-      <input 
-        type="range" 
-        min="-10" 
-        max="0" 
-        step="1"
-        v-model.number="tmPosition"
-        @change="updatePositioning"
-      >
-      {{ tmPosition / 10 }}em
-    </label>
-  </div>
-</template>
-
-<script setup>
-import { ref } from 'vue'
-
-const { updateConfig, config } = useSmartScript()
-
-const enableOrdinals = ref(config.value.symbols.ordinals)
-const tmPosition = ref(-5) // -0.5em
-
-function updatePositioning() {
-  updateConfig({
-    symbols: {
-      ordinals: enableOrdinals.value
-    },
-    positioning: {
-      trademark: {
-        body: `${tmPosition.value / 10}em`
-      }
-    }
-  })
-}
-</script>
-```
-
-### Content Editor Integration
-
-```vue
-<template>
-  <div class="editor">
-    <div class="toolbar">
-      <button @click="insertTrademark">Insert ™</button>
-      <button @click="insertRegistered">Insert ®</button>
-      <button @click="insertCopyright">Insert ©</button>
-    </div>
-    
-    <div 
-      ref="editorRef"
-      contenteditable="true"
-      @input="handleInput"
-      class="editor-content"
+  <div class="editor-container">
+    <textarea 
+      v-model="source" 
+      placeholder="Type (TM), 1st, H2O, x^2..."
     />
     
     <div class="preview">
-      <h4>Preview with SmartScript:</h4>
-      <div ref="previewRef" v-html="content" />
+      <h3>Preview:</h3>
+      <div ref="previewRef" v-html="source" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { debounce } from 'perfect-debounce'
 
-const { process } = useSmartScript()
-
-const editorRef = ref(null)
-const previewRef = ref(null)
-const content = ref('')
-
-function handleInput() {
-  content.value = editorRef.value.innerHTML
-  
-  // Update preview
-  nextTick(() => {
-    previewRef.value.innerHTML = content.value
-    // Process only the preview element
-    processElement(previewRef.value)
-  })
-}
-
-function insertTrademark() {
-  document.execCommand('insertText', false, '(TM)')
-  handleInput()
-}
-
-function insertRegistered() {
-  document.execCommand('insertText', false, '(R)')
-  handleInput()
-}
-
-function insertCopyright() {
-  document.execCommand('insertText', false, '(C)')
-  handleInput()
-}
-
-// Process specific element
-function processElement(element) {
-  const { $smartscript } = useNuxtApp()
-  // This is a hypothetical method - actual implementation may vary
-  if ($smartscript?.processElement) {
-    $smartscript.processElement(element)
-  }
-}
-</script>
-```
-
-### Monitoring Statistics
-
-```vue
-<template>
-  <div class="stats-dashboard">
-    <h3>Typography Statistics</h3>
-    
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.processedElements }}</div>
-        <div class="stat-label">Elements Processed</div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.superscripts }}</div>
-        <div class="stat-label">Superscripts</div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.subscripts }}</div>
-        <div class="stat-label">Subscripts</div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.total }}</div>
-        <div class="stat-label">Total Transformations</div>
-      </div>
-    </div>
-    
-    <button @click="refresh" :disabled="isProcessing">
-      {{ isProcessing ? 'Processing...' : 'Refresh Stats' }}
-    </button>
-  </div>
-</template>
-
-<script setup>
-const { stats, isProcessing, process } = useSmartScript()
-
-function refresh() {
-  process()
-}
-
-// Auto-refresh stats every 5 seconds
-const interval = setInterval(() => {
-  if (!isProcessing.value) {
-    process()
-  }
-}, 5000)
-
-onUnmounted(() => {
-  clearInterval(interval)
-})
-</script>
-
-<style scoped>
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.stat-card {
-  padding: 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-}
-
-.stat-value {
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-.stat-label {
-  color: #666;
-  font-size: 0.875rem;
-}
-</style>
-```
-
-## Direct API Access
-
-You can also access the smartscript API directly through the Nuxt app:
-
-```vue
-<script setup>
 const { $smartscript } = useNuxtApp()
+const source = ref('Try typing Product(TM) or H2O')
+const previewRef = ref(null)
 
-// Process content manually
-$smartscript.process()
-
-// Control observer
-$smartscript.startObserving()
-$smartscript.stopObserving()
-
-// Get current configuration
-const config = $smartscript.getConfig()
-
-// Update configuration
-$smartscript.updateConfig({
-  performance: {
-    debounce: 200,
-    batchSize: 100
+// Debounced preview update
+const updatePreview = debounce(async () => {
+  if (previewRef.value) {
+    previewRef.value.innerHTML = source.value
+    $smartscript.processElement(previewRef.value)
   }
-})
+}, 200)
 
-// Reset all processing
-$smartscript.reset()
-
-// Get statistics
-const stats = $smartscript.getStats()
-console.log(`Processed ${stats.total} transformations`)
+watch(source, updatePreview)
+onMounted(updatePreview)
 </script>
 ```
 
-## Excluding Content
+### Toggle Processing
 
-### Component Level
-
-Prevent processing of specific components:
+Enable/disable processing for specific sections:
 
 ```vue
 <template>
   <div>
-    <!-- This content will be processed -->
-    <p>Your Brand(TM) is great!</p>
-    
-    <!-- This content will NOT be processed -->
-    <pre class="no-superscript">
-      Raw text with (TM) and (R) symbols
-    </pre>
-    
-    <!-- Using data attribute -->
-    <div data-no-superscript>
-      This (TM) won't be transformed
-    </div>
-  </div>
-</template>
-```
-
-### Dynamic Exclusion
-
-```vue
-<template>
-  <div :class="{ 'no-superscript': !enableProcessing }">
-    <p>Content with (TM) symbols</p>
     <button @click="toggleProcessing">
-      {{ enableProcessing ? 'Disable' : 'Enable' }} Processing
+      {{ enabled ? 'Disable' : 'Enable' }} SmartScript
     </button>
+    
+    <div :class="{ 'no-superscript': !enabled }">
+      <p>This content has (TM) and (R) symbols.</p>
+      <p>Water formula: H2O</p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-const enableProcessing = ref(true)
-const { process } = useSmartScript()
+const { $smartscript } = useNuxtApp()
+const enabled = ref(true)
 
 function toggleProcessing() {
-  enableProcessing.value = !enableProcessing.value
-  if (enableProcessing.value) {
-    nextTick(() => process())
+  enabled.value = !enabled.value
+  if (enabled.value) {
+    // Reprocess when enabled
+    nextTick(() => $smartscript.processAll())
   }
 }
 </script>
 ```
 
-## Performance Tips
+## Exclusion Zones
 
-### 1. Batch Updates
-
-When making multiple content changes, batch them:
-
-```vue
-<script setup>
-const { process } = useSmartScript()
-const items = ref([])
-
-async function loadMultipleItems() {
-  // Load all items first
-  const promises = [
-    fetch('/api/item/1'),
-    fetch('/api/item/2'),
-    fetch('/api/item/3')
-  ]
-  
-  const responses = await Promise.all(promises)
-  items.value = await Promise.all(
-    responses.map(r => r.json())
-  )
-  
-  // Process once after all updates
-  await nextTick()
-  process()
-}
-</script>
-```
-
-### 2. Disable During Heavy Operations
-
-```vue
-<script setup>
-const { $smartscript } = useNuxtApp()
-
-async function heavyOperation() {
-  // Stop observing during heavy DOM manipulation
-  $smartscript.stopObserving()
-  
-  try {
-    // Do heavy work
-    await performBulkUpdates()
-  } finally {
-    // Re-enable and process
-    $smartscript.startObserving()
-    $smartscript.process()
-  }
-}
-</script>
-```
-
-### 3. Targeted Processing
-
-For large pages, process only what's needed:
+### Using Classes
 
 ```vue
 <template>
   <div>
-    <div v-for="section in sections" :key="section.id">
-      <div 
-        :ref="el => sectionRefs[section.id] = el"
-        v-html="section.content"
-      />
+    <!-- Processed -->
+    <p>Regular text with (TM)</p>
+    
+    <!-- NOT processed -->
+    <pre class="no-superscript">
+      Code with (TM) stays unchanged
+    </pre>
+  </div>
+</template>
+```
+
+### Using Data Attributes
+
+```vue
+<template>
+  <div>
+    <!-- Processed -->
+    <p>Normal content (R)</p>
+    
+    <!-- NOT processed -->
+    <div data-no-superscript>
+      Raw content (R) preserved
     </div>
   </div>
 </template>
+```
 
+### Automatic Exclusions
+
+These elements are never processed:
+
+- `<pre>` - Code blocks
+- `<code>` - Inline code
+- `<script>` - JavaScript
+- `<style>` - CSS
+- `<textarea>` - Form inputs
+
+## SSR Considerations (v0.4.0+)
+
+SmartScript now supports server-side rendering:
+
+### Development Mode
+
+SSR is disabled by default in development to avoid hydration warnings:
+
+```vue
 <script setup>
-const sectionRefs = ref({})
-const { $smartscript } = useNuxtApp()
-
-function processSingleSection(sectionId) {
-  const element = sectionRefs.value[sectionId]
-  if (element && $smartscript.processElement) {
-    $smartscript.processElement(element)
-  }
+// Only process client-side in dev
+if (process.client && process.dev) {
+  onMounted(() => {
+    const { $smartscript } = useNuxtApp()
+    $smartscript.processAll()
+  })
 }
 </script>
 ```
 
-## SSR Considerations
+### Production Mode
 
-The module only runs on the client side. For SSR apps:
+In production, content is pre-transformed during SSR:
 
 ```vue
-<template>
-  <ClientOnly>
-    <div class="typography-stats">
-      <p>Transformations: {{ stats.total }}</p>
-    </div>
-    <template #fallback>
-      <div>Loading typography processor...</div>
-    </template>
-  </ClientOnly>
-</template>
-
 <script setup>
-const { stats } = useSmartScript()
+// Check if already processed server-side
+onMounted(() => {
+  const processed = document.querySelector('[data-smartscript-processed]')
+  if (!processed) {
+    // Only process if not already done server-side
+    const { $smartscript } = useNuxtApp()
+    $smartscript.processAll()
+  }
+})
+</script>
+```
+
+## Performance Optimization
+
+### Batch Updates
+
+Process multiple changes at once:
+
+```vue
+<script setup>
+const { $smartscript } = useNuxtApp()
+const items = ref([])
+
+async function loadAllItems() {
+  // Load all data first
+  const promises = ids.map(id => fetch(`/api/item/${id}`))
+  const responses = await Promise.all(promises)
+  items.value = await Promise.all(responses.map(r => r.json()))
+  
+  // Single process call after all updates
+  await nextTick()
+  $smartscript.processAll()
+}
+</script>
+```
+
+### Selective Processing
+
+Process only visible content:
+
+```vue
+<script setup>
+import { useIntersectionObserver } from '@vueuse/core'
+
+const { $smartscript } = useNuxtApp()
+const sectionRef = ref(null)
+const processed = ref(false)
+
+useIntersectionObserver(sectionRef, ([{ isIntersecting }]) => {
+  if (isIntersecting && !processed.value) {
+    $smartscript.processElement(sectionRef.value)
+    processed.value = true
+  }
+})
+</script>
+
+<template>
+  <section ref="sectionRef">
+    <!-- Content processed when visible -->
+  </section>
+</template>
+```
+
+## API Reference
+
+### Plugin Methods
+
+```typescript
+interface SmartScriptPlugin {
+  // Process entire page
+  processAll(): void
+  
+  // Process specific element
+  processElement(element: Element): void
+  
+  // Re-process everything (clears cache)
+  refresh(): void
+  
+  // Clean up and stop processing
+  destroy(): void
+}
+```
+
+### Accessing the Plugin
+
+```vue
+<script setup>
+// In Composition API
+const { $smartscript } = useNuxtApp()
+
+// In Options API
+export default {
+  methods: {
+    process() {
+      this.$smartscript.processAll()
+    }
+  }
+}
 </script>
 ```
 
@@ -478,51 +309,40 @@ const { stats } = useSmartScript()
 
 ### Content Not Processing
 
-```vue
-<script setup>
-import { onMounted } from 'vue'
+1. **Check element is not excluded**:
+   - No `no-superscript` class
+   - Not inside `<pre>` or `<code>`
+   - No `data-no-superscript` attribute
 
-const { process, isProcessing } = useSmartScript()
+2. **Verify timing**:
+   ```vue
+   // Ensure DOM is ready
+   await nextTick()
+   $smartscript.processAll()
+   ```
 
-onMounted(() => {
-  // Ensure content is ready
-  setTimeout(() => {
-    if (!isProcessing.value) {
-      console.log('Manually triggering process')
-      process()
-    }
-  }, 2000)
-})
-</script>
-```
+3. **Check configuration**:
+   ```vue
+   // Verify transformations are enabled
+   const config = useRuntimeConfig()
+   console.log(config.public.smartscript)
+   ```
 
-### Hydration Mismatches
+### Memory Management
 
-If you see hydration warnings:
-
-```vue
-<script setup>
-const { process } = useSmartScript()
-
-onMounted(() => {
-  // Wait for hydration to complete
-  setTimeout(() => {
-    process()
-  }, 1500)
-})
-</script>
-```
-
-### Memory Leaks
-
-Always clean up observers:
+Clean up when components unmount:
 
 ```vue
 <script setup>
-const { $smartscript } = useNuxtApp()
-
 onUnmounted(() => {
-  $smartscript.stopObserving()
+  // If using custom observers
+  observer?.disconnect()
 })
 </script>
 ```
+
+## Next Steps
+
+- [Configuration Options](/api/configuration) - Customize SmartScript
+- [Deployment Modes](/guide/deployment-modes) - SSR vs Client configurations
+- [Examples](/examples) - Real-world usage patterns

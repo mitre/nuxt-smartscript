@@ -7,15 +7,15 @@ Get up and running with Nuxt SmartScript in under 2 minutes.
 ::: code-group
 
 ```bash [npm]
-npm install @mitre/@mitre/nuxt-smartscript
+npm install @mitre/nuxt-smartscript
 ```
 
 ```bash [pnpm]
-pnpm add @mitre/@mitre/nuxt-smartscript
+pnpm add @mitre/nuxt-smartscript
 ```
 
 ```bash [yarn]
-yarn add @mitre/@mitre/nuxt-smartscript
+yarn add @mitre/nuxt-smartscript
 ```
 
 :::
@@ -26,7 +26,7 @@ Add the module to your `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['@mitre/@mitre/nuxt-smartscript']
+  modules: ['@mitre/nuxt-smartscript']
 })
 ```
 
@@ -79,11 +79,14 @@ Want to customize the behavior? Add options to your config:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['@mitre/@mitre/nuxt-smartscript'],
+  modules: ['@mitre/nuxt-smartscript'],
   
   smartscript: {
-    // Disable ordinal transformations
-    symbols: {
+    // Enable SSR for static sites (v0.4.0+)
+    ssr: true,
+    
+    // Disable specific transformations
+    transformations: {
       ordinals: false
     },
     
@@ -144,6 +147,6 @@ To prevent processing of specific content:
 
 ## Need Help?
 
-- Check our [troubleshooting guide](/guide/getting-started#troubleshooting)
+- Review [deployment modes](/guide/deployment-modes) for configuration options
 - View [architecture documentation](/architecture)
-- Report issues on [GitHub](https://github.com/mitre/@mitre/@mitre/nuxt-smartscript/issues)
+- Report issues on [GitHub](https://github.com/mitre/nuxt-smartscript/issues)

@@ -11,7 +11,7 @@ hero:
       link: /quick-start
     - theme: alt
       text: View on GitHub
-      link: https://github.com/mitre/@mitre/@mitre/nuxt-smartscript
+      link: https://github.com/mitre/nuxt-smartscript
 
 features:
   - icon: 🔤
@@ -32,6 +32,9 @@ features:
   - icon: ♿
     title: Fully Accessible
     details: ARIA labels and semantic HTML ensure screen reader compatibility
+  - icon: 🚀
+    title: SSR/SSG Support
+    details: Server-side rendering and static generation for SEO-friendly content (v0.4.0)
 ---
 
 ## What is Nuxt SmartScript?
@@ -67,14 +70,14 @@ E=mc^2 is Einstein's famous equation.
 Install the module to your Nuxt application with one command:
 
 ```bash
-npm install @mitre/@mitre/nuxt-smartscript
+npm install @mitre/nuxt-smartscript
 ```
 
 Add it to your `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
-  modules: ['@mitre/@mitre/nuxt-smartscript']
+  modules: ['@mitre/nuxt-smartscript']
 })
 ```
 

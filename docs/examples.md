@@ -93,8 +93,8 @@
 /* app.css */
 
 /* Make trademark symbols smaller in headers */
-h1 sup.ss-sup.ss-tm,
-h2 sup.ss-sup.ss-tm {
+h1 .ss-sup.ss-tm,
+h2 .ss-sup.ss-tm {
   font-size: 0.5em;
   top: -0.8em;
 }
@@ -105,13 +105,13 @@ sub.ss-sub {
 }
 
 /* Custom styling for ordinals */
-sup.ss-sup.ss-ordinal {
+.ss-sup.ss-ordinal {
   font-weight: bold;
   font-size: 0.6em;
 }
 
 /* Override registered symbol positioning */
-sup.ss-sup.ss-reg {
+.ss-sup.ss-reg {
   vertical-align: baseline;
   position: relative;
   top: -0.5em;
@@ -122,13 +122,13 @@ sup.ss-sup.ss-reg {
 
 ```typescript
 // composables/useCustomStyles.ts
-import { CSS_CLASSES } from '@mitre/@mitre/nuxt-smartscript'
+// Note: SmartScript uses these CSS classes
 
 export function useCustomStyles() {
   // Add custom handling for specific elements
   onMounted(() => {
     // Find all trademark elements
-    const trademarks = document.querySelectorAll(`.${CSS_CLASSES.trademark}`)
+    const trademarks = document.querySelectorAll('.ss-tm')
     
     // Add custom attributes or classes
     trademarks.forEach(el => {

@@ -200,7 +200,7 @@ For content loaded after initial render:
 
 ```vue
 <script setup>
-const { process } = useSmartScript()
+const { $smartscript } = useNuxtApp()
 const content = ref('')
 
 async function loadContent() {
@@ -209,7 +209,7 @@ async function loadContent() {
   
   // Trigger processing after content loads
   await nextTick()
-  process()
+  $smartscript.processAll()
 }
 </script>
 ```
