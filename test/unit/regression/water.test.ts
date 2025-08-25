@@ -44,8 +44,8 @@ describe('water and Headers Test', () => {
       const result = processText(text, combinedPattern)
       // Should be plain text, no transformations
       expect(result).toHaveLength(1)
-      expect(result[0].type).toBe('text')
-      expect(result[0].content).toBe(text)
+      expect(result[0]!.type).toBe('text')
+      expect(result[0]!.content).toBe(text)
     })
   })
 
@@ -69,8 +69,8 @@ describe('water and Headers Test', () => {
     // Should have subscripts for both 2 and 4
     const subscripts = result.filter((p) => p.type === 'sub')
     expect(subscripts.length).toBe(2)
-    expect(subscripts[0].content).toBe('2')
-    expect(subscripts[1].content).toBe('4')
+    expect(subscripts[0]!.content).toBe('2')
+    expect(subscripts[1]!.content).toBe('4')
   })
 
   it('should NOT transform H7 or higher', () => {

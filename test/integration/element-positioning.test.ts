@@ -40,8 +40,8 @@ describe('element Positioning Integration', () => {
       expect(regElements.length).toBe(1)
 
       // Verify they are SPAN elements
-      expect(tmElements[0].tagName).toBe('SPAN')
-      expect(regElements[0].tagName).toBe('SPAN')
+      expect(tmElements[0]!.tagName).toBe('SPAN')
+      expect(regElements[0]!.tagName).toBe('SPAN')
     })
 
     it('should apply CSS variables to positioned elements', () => {

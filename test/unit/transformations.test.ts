@@ -238,8 +238,8 @@ describe('transformation Configuration', () => {
 
       // Everything should remain as plain text
       expect(parts).toHaveLength(1)
-      expect(parts[0].type).toBe('text')
-      expect(parts[0].content).toBe(text)
+      expect(parts[0]!.type).toBe('text')
+      expect(parts[0]!.content).toBe(text)
     })
   })
 

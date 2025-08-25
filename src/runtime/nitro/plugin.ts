@@ -16,10 +16,10 @@ export default <NitroAppPlugin> function (nitro) {
   // @ts-expect-error - render:html hook exists but not typed in nitropack
   nitro.hooks.hook('render:html', (html: Record<string, string[]>, { event }: { event: { context: { $config?: { public?: { smartscript?: SuperscriptConfig } } } } }) => {
     // Get configuration from runtime config
-    const config = event.context.$config?.public?.smartscript || {}
+    const config = event.context.$config?.public?.smartscript
 
-    // Skip if SSR processing is disabled
-    if (config.ssr === false) {
+    // Skip if no config or SSR processing is disabled
+    if (!config || config.ssr === false) {
       logger.debug('[Nitro] SSR processing disabled via config')
       return
     }

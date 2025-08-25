@@ -51,8 +51,8 @@ describe('hTML Headers Bug Fix', () => {
       const result = processText(text, combinedPattern)
       // Should return as plain text, no transformations
       expect(result).toHaveLength(1)
-      expect(result[0].type).toBe('text')
-      expect(result[0].content).toBe(text)
+      expect(result[0]!.type).toBe('text')
+      expect(result[0]!.content).toBe(text)
     })
   })
 

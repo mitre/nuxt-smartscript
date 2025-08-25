@@ -161,34 +161,34 @@ describe('mathematical Notation Support', () => {
       const result = processMatch('x_n')
       expect(result.modified).toBe(true)
       expect(result.parts).toHaveLength(2)
-      expect(result.parts[0].type).toBe('text')
-      expect(result.parts[0].content).toBe('x')
-      expect(result.parts[1].type).toBe('sub')
-      expect(result.parts[1].content).toBe('n')
+      expect(result.parts[0]!.type).toBe('text')
+      expect(result.parts[0]!.content).toBe('x')
+      expect(result.parts[1]!.type).toBe('sub')
+      expect(result.parts[1]!.content).toBe('n')
     })
 
     it('should correctly process single-letter superscripts', () => {
       const result = processMatch('x^n')
       expect(result.modified).toBe(true)
       expect(result.parts).toHaveLength(2)
-      expect(result.parts[0].type).toBe('text')
-      expect(result.parts[0].content).toBe('x')
-      expect(result.parts[1].type).toBe('super')
-      expect(result.parts[1].content).toBe('n')
+      expect(result.parts[0]!.type).toBe('text')
+      expect(result.parts[0]!.content).toBe('x')
+      expect(result.parts[1]!.type).toBe('super')
+      expect(result.parts[1]!.content).toBe('n')
     })
 
     it('should correctly extract content from braced expressions', () => {
       const result1 = processMatch('x_{n+1}')
       expect(result1.modified).toBe(true)
       expect(result1.parts).toHaveLength(2)
-      expect(result1.parts[0].content).toBe('x')
-      expect(result1.parts[1].content).toBe('n+1') // Braces removed
+      expect(result1.parts[0]!.content).toBe('x')
+      expect(result1.parts[1]!.content).toBe('n+1') // Braces removed
 
       const result2 = processMatch('x^{2n}')
       expect(result2.modified).toBe(true)
       expect(result2.parts).toHaveLength(2)
-      expect(result2.parts[0].content).toBe('x')
-      expect(result2.parts[1].content).toBe('2n') // Braces removed
+      expect(result2.parts[0]!.content).toBe('x')
+      expect(result2.parts[1]!.content).toBe('2n') // Braces removed
     })
 
     it('should handle nested braces in math', () => {

@@ -185,12 +185,12 @@ describe('sSR with jsdom', () => {
       const divs = document.querySelectorAll('div')
 
       // First div with data-no-superscript should remain unchanged
-      expect(divs[0].innerHTML).toBe('Product(TM) H2O')
+      expect(divs[0]!.innerHTML).toBe('Product(TM) H2O')
 
       // Second div should be transformed
-      expect(divs[1].innerHTML).toContain('<span class="ss-sup ss-tm" aria-label="trademark">™</span>')
-      expect(divs[1].innerHTML).toContain('H<sub class="ss-sub"')
-      expect(divs[1].innerHTML).toContain('>2</sub>O')
+      expect(divs[1]!.innerHTML).toContain('<span class="ss-sup ss-tm" aria-label="trademark">™</span>')
+      expect(divs[1]!.innerHTML).toContain('H<sub class="ss-sub"')
+      expect(divs[1]!.innerHTML).toContain('>2</sub>O')
     })
 
     it('should not transform nested exclusions', () => {

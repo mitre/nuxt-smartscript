@@ -205,7 +205,7 @@ describe('text Processing', () => {
       // Unicode input
       const unicodeResult = processMatch('™')
       expect(unicodeResult.modified).toBe(true)
-      expect(unicodeResult.parts[0].content).toBe('™')
+      expect(unicodeResult.parts[0]!.content).toBe('™')
 
       // Mixed case that shouldn't match
       const noMatch = processMatch('random text')

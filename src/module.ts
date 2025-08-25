@@ -1,4 +1,3 @@
-import type { RuntimeConfig } from './runtime/types'
 import { fileURLToPath } from 'node:url'
 import { addPlugin, addServerPlugin, createResolver, defineNuxtModule } from '@nuxt/kit'
 
@@ -220,6 +219,8 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.css.push(resolver.resolve('./runtime/superscript.css'))
 
     // Pass module options to runtime
-    nuxt.options.runtimeConfig.public.smartscript = options as unknown as RuntimeConfig
+    // The options are merged with defaults by Nuxt, so all required fields are present
+    // eslint-disable-next-line ts/no-explicit-any
+    nuxt.options.runtimeConfig.public.smartscript = options as any
   },
 })

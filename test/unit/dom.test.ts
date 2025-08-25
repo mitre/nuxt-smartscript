@@ -114,7 +114,7 @@ describe('dOM Output: Actual Element Creation', () => {
       div.appendChild(fragment)
 
       expect(div.childNodes).toHaveLength(2)
-      expect(div.childNodes[0].textContent).toBe('MITRE')
+      expect(div.childNodes[0]!.textContent).toBe('MITRE')
 
       const sup = div.childNodes[1] as HTMLElement
       expect(sup.tagName).toBe('SPAN') // TM uses SPAN for positioning
@@ -133,7 +133,7 @@ describe('dOM Output: Actual Element Creation', () => {
       div.appendChild(fragment)
 
       expect(div.childNodes).toHaveLength(2)
-      expect(div.childNodes[0].textContent).toBe('1')
+      expect(div.childNodes[0]!.textContent).toBe('1')
 
       const sup = div.childNodes[1] as HTMLElement
       expect(sup.tagName).toBe('SUP')
@@ -153,14 +153,14 @@ describe('dOM Output: Actual Element Creation', () => {
       div.appendChild(fragment)
 
       expect(div.childNodes).toHaveLength(3)
-      expect(div.childNodes[0].textContent).toBe('H')
+      expect(div.childNodes[0]!.textContent).toBe('H')
 
       const sub = div.childNodes[1] as HTMLElement
       expect(sub.tagName).toBe('SUB')
       expect(sub.className).toBe('ss-sub')
       expect(sub.textContent).toBe('2')
 
-      expect(div.childNodes[2].textContent).toBe('O')
+      expect(div.childNodes[2]!.textContent).toBe('O')
     })
 
     it('should create fragment with mixed super and subscripts', () => {
@@ -201,8 +201,8 @@ describe('dOM Output: Actual Element Creation', () => {
       // Should have text "MITRE" and trademark "™" as SPAN (hybrid approach)
       const tmElements = div.querySelectorAll('span.ss-tm')
       expect(tmElements).toHaveLength(1)
-      expect(tmElements[0].className).toBe('ss-sup ss-tm')
-      expect(tmElements[0].textContent).toBe('™')
+      expect(tmElements[0]!.className).toBe('ss-sup ss-tm')
+      expect(tmElements[0]!.textContent).toBe('™')
     })
 
     it('should process ordinal numbers correctly', () => {
@@ -214,8 +214,8 @@ describe('dOM Output: Actual Element Creation', () => {
       // Should have "1" as text and "st" as superscript
       const supElements = div.querySelectorAll('sup.ss-sup')
       expect(supElements).toHaveLength(1)
-      expect(supElements[0].className).toBe('ss-sup ss-ordinal')
-      expect(supElements[0].textContent).toBe('st')
+      expect(supElements[0]!.className).toBe('ss-sup ss-ordinal')
+      expect(supElements[0]!.textContent).toBe('st')
     })
 
     it('should process chemical formulas correctly', () => {
@@ -227,7 +227,7 @@ describe('dOM Output: Actual Element Creation', () => {
       // Should have H, subscript 2, and O
       const subElements = div.querySelectorAll('sub.ss-sub')
       expect(subElements).toHaveLength(1)
-      expect(subElements[0].textContent).toBe('2')
+      expect(subElements[0]!.textContent).toBe('2')
     })
 
     it('should process math notation correctly', () => {
@@ -239,7 +239,7 @@ describe('dOM Output: Actual Element Creation', () => {
       // Should have superscript 2
       const supElements = div.querySelectorAll('sup.ss-sup')
       expect(supElements).toHaveLength(1)
-      expect(supElements[0].textContent).toBe('2')
+      expect(supElements[0]!.textContent).toBe('2')
     })
 
     it('should process copyright symbol correctly', () => {
