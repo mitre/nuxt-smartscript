@@ -33,29 +33,12 @@ export default withMermaid(defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Quick Start', link: '/quick-start' },
       {
-        text: 'Guide',
+        text: 'Documentation',
         items: [
           { text: 'Getting Started', link: '/guide/getting-started' },
-          { text: 'Deployment Modes', link: '/guide/deployment-modes' },
-          { text: 'Vue Integration', link: '/vue-integration' },
+          { text: 'Configuration', link: '/api/configuration' },
+          { text: 'Selectors', link: '/selectors' },
           { text: 'Examples', link: '/examples' },
-        ],
-      },
-      {
-        text: 'Architecture',
-        items: [
-          { text: 'Overview', link: '/architecture' },
-          { text: 'System Architecture', link: '/system-architecture' },
-          { text: 'Processing Pipeline', link: '/processing-architecture' },
-        ],
-      },
-      {
-        text: 'Testing',
-        items: [
-          { text: 'Overview', link: '/testing' },
-          { text: 'Unit Tests', link: '/testing/unit-tests' },
-          { text: 'Integration Tests', link: '/testing/integration-tests' },
-          { text: 'E2E Tests', link: '/testing/e2e-tests' },
         ],
       },
       {
@@ -66,54 +49,42 @@ export default withMermaid(defineConfig({
           { text: 'Plugin API', link: '/api/plugin' },
         ],
       },
+      {
+        text: 'Advanced',
+        items: [
+          { text: 'Custom Patterns', link: '/advanced/custom-patterns' },
+          { text: 'Performance', link: '/advanced/performance' },
+          { text: 'Architecture', link: '/architecture' },
+        ],
+      },
       { text: 'Contributing', link: '/contributing' },
     ],
 
     sidebar: [
       {
-        text: 'Introduction',
+        text: 'Getting Started',
         collapsed: false,
         items: [
           { text: 'What is SmartScript?', link: '/' },
           { text: 'Quick Start', link: '/quick-start' },
+          { text: 'Installation & Setup', link: '/guide/getting-started' },
         ],
       },
       {
-        text: 'Guide',
+        text: 'Configuration',
         collapsed: false,
         items: [
-          { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'Configuration Options', link: '/api/configuration' },
+          { text: 'Element Selectors', link: '/selectors' },
           { text: 'Deployment Modes', link: '/guide/deployment-modes' },
-          { text: 'Vue Integration', link: '/vue-integration' },
+        ],
+      },
+      {
+        text: 'Usage & Examples',
+        collapsed: false,
+        items: [
           { text: 'Patterns & Examples', link: '/examples' },
-        ],
-      },
-      {
-        text: 'Architecture',
-        collapsed: false,
-        items: [
-          { text: 'Overview', link: '/architecture' },
-          { text: 'System Architecture', link: '/system-architecture' },
-          { text: 'Processing Pipeline', link: '/processing-architecture' },
-        ],
-      },
-      {
-        text: 'Testing',
-        collapsed: false,
-        items: [
-          { text: 'Testing Overview', link: '/testing' },
-          { text: 'Testing Guide', link: '/testing/index' },
-          { text: 'Unit Tests', link: '/testing/unit-tests' },
-          { text: 'Integration Tests', link: '/testing/integration-tests' },
-          { text: 'E2E Tests', link: '/testing/e2e-tests' },
-          { text: 'Writing Tests', link: '/testing/writing-tests' },
-        ],
-      },
-      {
-        text: 'API Reference',
-        collapsed: false,
-        items: [
-          { text: 'Configuration', link: '/api/configuration' },
+          { text: 'Vue Integration', link: '/vue-integration' },
           { text: 'Composables', link: '/api/composables' },
           { text: 'Plugin API', link: '/api/plugin' },
         ],
@@ -123,8 +94,29 @@ export default withMermaid(defineConfig({
         collapsed: true,
         items: [
           { text: 'Custom Patterns', link: '/advanced/custom-patterns' },
-          { text: 'Performance', link: '/advanced/performance' },
           { text: 'Pattern Design', link: '/pattern-design' },
+          { text: 'Performance Tuning', link: '/advanced/performance' },
+        ],
+      },
+      {
+        text: 'Architecture',
+        collapsed: true,
+        items: [
+          { text: 'System Overview', link: '/architecture' },
+          { text: 'Architecture Details', link: '/system-architecture' },
+          { text: 'Processing Pipeline', link: '/processing-architecture' },
+        ],
+      },
+      {
+        text: 'Testing',
+        collapsed: true,
+        items: [
+          { text: 'Testing Guide', link: '/testing/index' },
+          { text: 'Testing Architecture', link: '/testing' },
+          { text: 'Writing Tests', link: '/testing/writing-tests' },
+          { text: 'Unit Tests', link: '/testing/unit-tests' },
+          { text: 'Integration Tests', link: '/testing/integration-tests' },
+          { text: 'E2E Tests', link: '/testing/e2e-tests' },
         ],
       },
       {
@@ -134,6 +126,7 @@ export default withMermaid(defineConfig({
           { text: 'Contributing Guide', link: '/contributing' },
           { text: 'Development Workflow', link: '/contributing/development-workflow' },
           { text: 'Release Process', link: '/contributing/release-process' },
+          { text: 'TypeScript Architecture', link: '/contributing/typescript-architecture' },
         ],
       },
       {
