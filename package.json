@@ -1,9 +1,11 @@
 {
   "name": "@mitre/nuxt-smartscript",
+  "type": "module",
   "version": "0.3.0",
   "description": "Smart typography transformations for Nuxt - automatic superscript, subscript, and symbol formatting",
-  "repository": "mitre/nuxt-smartscript",
+  "author": "SAF Team <saf@mitre.org>",
   "license": "Apache-2.0",
+  "repository": "mitre/nuxt-smartscript",
   "keywords": [
     "nuxt",
     "nuxt3",
@@ -15,8 +17,6 @@
     "formatting",
     "text-transform"
   ],
-  "author": "SAF Team <saf@mitre.org>",
-  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
@@ -40,12 +40,14 @@
   "scripts": {
     "prepack": "nuxt-module-build build",
     "dev": "npm run dev:prepare && nuxi dev playground",
-    "dev:build": "nuxi build playground",
+    "build": "nuxi build playground",
+    "generate": "nuxi generate playground",
+    "preview": "nuxi preview playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "npm run lint && npm run test && npm run prepack && CHANGELOGEN_NO_GITHUB=true changelogen --release --push",
-    "release:minor": "npm run lint && npm run test && npm run prepack && CHANGELOGEN_NO_GITHUB=true changelogen --release minor --push",
-    "release:patch": "npm run lint && npm run test && npm run prepack && CHANGELOGEN_NO_GITHUB=true changelogen --release patch --push",
-    "release:major": "npm run lint && npm run test && npm run prepack && CHANGELOGEN_NO_GITHUB=true changelogen --release major --push",
+    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && git push --follow-tags",
+    "release:minor": "npm run lint && npm run test && npm run prepack && changelogen --release minor && git push --follow-tags",
+    "release:patch": "npm run lint && npm run test && npm run prepack && changelogen --release patch && git push --follow-tags",
+    "release:major": "npm run lint && npm run test && npm run prepack && changelogen --release major && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -58,6 +60,7 @@
     "@nuxt/kit": "^4.0.3"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^5.2.1",
     "@nuxt/devtools": "^2.6.2",
     "@nuxt/eslint-config": "^1.9.0",
     "@nuxt/module-builder": "^1.0.2",
@@ -67,9 +70,13 @@
     "changelogen": "^0.6.2",
     "eslint": "^9.33.0",
     "jsdom": "^24.0.0",
+    "mermaid": "^11.10.1",
     "nuxt": "^4.0.3",
+    "playwright-core": "^1.55.0",
+    "puppeteer": "^24.17.0",
     "typescript": "~5.9.2",
     "vitepress": "^1.5.0-alpha.12",
+    "vitepress-plugin-mermaid": "^2.0.17",
     "vitest": "^3.2.4",
     "vue-tsc": "^3.0.5"
   }

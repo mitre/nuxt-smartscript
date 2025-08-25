@@ -1,318 +1,234 @@
-# Architecture
+# nuxt-smartscript Architecture
 
 ## Overview
 
-The @mitre/@mitre/nuxt-smartscript module follows a modular, separation-of-concerns architecture designed for maintainability, testability, and extensibility. The codebase is organized into focused modules, each responsible for a specific aspect of the typography transformation system.
+nuxt-smartscript is a Nuxt 3 module that performs automatic typography transformations using a unified DOM-based approach for both client-side and server-side rendering (SSR/SSG).
 
-## Module Structure
+## Core Architecture
 
-```
-src/runtime/
-├── plugin.ts                 # Main orchestrator
-├── composables/
-│   └── useSmartScript.ts    # Vue composable API
-└── smartscript/
-    ├── types.ts             # TypeScript interfaces
-    ├── config.ts            # Configuration management
-    ├── patterns.ts          # Regex patterns & matchers
-    ├── processor.ts         # Text processing logic
-    ├── dom.ts               # DOM manipulation
-    ├── engine.ts            # Processing engine
-    ├── errors.ts            # Error handling
-    └── index.ts             # Public API exports
-```
+### Two Processing Modes
 
-## Core Modules
+The module operates in two complementary modes:
 
-### `plugin.ts` - Main Orchestrator
-**Responsibility:** Integrates the module with Nuxt, manages lifecycle hooks, and provides the public API.
+1. **Client-side Processing** (Browser)
+   - Uses native browser DOM APIs
+   - Handles dynamic content with MutationObserver
+   - Processes content after Vue hydration
 
-```typescript
-// Key responsibilities:
-- Initialize configuration from runtime config
-- Set up client-side processing hooks
-- Create and manage MutationObserver
-- Provide $smartscript API to Nuxt app
-- Handle navigation and route changes
-```
+2. **Server-side Processing** (SSR/SSG)
+   - Uses jsdom to simulate DOM environment
+   - Processes during Nuxt's render:html hook
+   - Pre-transforms content for static generation
 
-**When to modify:** When adding new Nuxt hooks, API methods, or changing initialization flow.
+### Unified Processing Pipeline
 
-### `types.ts` - Type Definitions
-**Responsibility:** Central location for all TypeScript interfaces and type definitions.
-
-```typescript
-export interface SuperscriptConfig {
-  symbols: SymbolConfig
-  selectors: SelectorConfig
-  performance: PerformanceConfig
-  positioning?: PositioningConfig
-}
-
-export interface TextPart {
-  type: 'text' | 'super' | 'sub'
-  content: string
-}
-```
-
-**When to modify:** When adding new configuration options or data structures.
-
-### `config.ts` - Configuration Management
-**Responsibility:** Default configuration, CSS class constants, validation, and merging user configs.
-
-```typescript
-// Centralized CSS class names for consistency
-export const CSS_CLASSES = {
-  superscript: 'ss-sup',
-  subscript: 'ss-sub',
-  trademark: 'ss-tm',
-  registered: 'ss-reg',
-  ordinal: 'ss-ordinal',
-  math: 'ss-math',
-} as const
-
-export const DEFAULT_CONFIG: SuperscriptConfig = {
-  symbols: {
-    trademark: ['™', '(TM)', 'TM'],
-    registered: ['®', '(R)'],
-    // ...
-  },
-  selectors: {
-    exclude: [
-      // Automatically excludes processed elements
-      `sup.${CSS_CLASSES.superscript}`,
-      `sub.${CSS_CLASSES.subscript}`,
-      // ...
-    ]
-  }
-}
-
-export function mergeConfig(userConfig: Partial<SuperscriptConfig>): SuperscriptConfig
-export function validateConfig(config: SuperscriptConfig): string[]
-```
-
-**Key features:**
-- **CSS_CLASSES constant:** Centralizes all CSS class names to avoid hardcoding
-- **Automatic exclusion:** Processed elements are automatically excluded to prevent double-processing
-- **Single source of truth:** All class names are defined in one place for maintainability
-
-**When to modify:** When adding new configuration defaults, CSS classes, or validation rules.
-
-### `patterns.ts` - Pattern Management
-**Responsibility:** Regex patterns and pattern matching utilities.
-
-```typescript
-export function createPatterns(config: SuperscriptConfig): PatternSet {
-  return {
-    trademark: /™|\(TM\)|\bTM\b/g,
-    registered: /®|\(R\)(?!\))/g,
-    ordinals: /\b(\d+)(st|nd|rd|th)\b/g,
-    // ...
-  }
-}
-
-export const PatternMatchers = {
-  isTrademark: (text: string): boolean => /^(™|\(TM\)|TM)$/.test(text),
-  isRegistered: (text: string): boolean => /^(®|\(R\))$/.test(text),
-  // ...
-}
-```
-
-**When to modify:** When adding new text patterns to detect and transform.
-
-### `processor.ts` - Text Processing
-**Responsibility:** Core logic for transforming matched text into structured parts.
-
-```typescript
-export function processMatch(matched: string): ProcessingResult {
-  if (PatternMatchers.isTrademark(matched)) {
-    return {
-      modified: true,
-      parts: [{ type: 'super', content: '™' }]
-    }
-  }
-  // ... handle other patterns
-}
-
-export function processTextNode(textNode: Text, config, patterns): boolean
-```
-
-**When to modify:** When changing how matches are transformed or adding new transformation logic.
-
-### `dom.ts` - DOM Utilities
-**Responsibility:** DOM element creation and manipulation.
-
-```typescript
-export function createElement(part: TextPart, isHeader: boolean, config): HTMLElement | Text {
-  if (part.type === 'super') {
-    const sup = document.createElement('sup')
-    sup.textContent = part.content
-    sup.className = determineClass(part.content)
-    // Apply positioning...
-    return sup
-  }
-  // ...
-}
-
-export function replaceTextNode(textNode: Text, fragment: DocumentFragment): void
-```
-
-**When to modify:** When changing DOM element creation, styling, or attributes.
-
-### `engine.ts` - Processing Engine
-**Responsibility:** Orchestrates the processing flow, manages batching and performance.
-
-```typescript
-export function processContent(config, patterns, combinedPattern): void {
-  const elements = document.querySelectorAll(config.selectors.include.join(', '))
-  elements.forEach(element => processElement(element, config, patterns, combinedPattern))
-}
-
-export function createContentObserver(processCallback, config): MutationObserver
-```
-
-**When to modify:** When changing the processing flow, batching logic, or observer behavior.
-
-### `errors.ts` - Error Handling
-**Responsibility:** Error recovery and graceful degradation.
-
-```typescript
-export class SmartScriptError extends Error {
-  constructor(message: string, public readonly code: string) {
-    super(message)
-    this.name = 'SmartScriptError'
-  }
-}
-
-export function handleProcessingError(error: Error, context: string): void
-```
-
-**When to modify:** When adding new error types or changing error handling strategy.
-
-### `index.ts` - Public API
-**Responsibility:** Exports the public API surface for the module.
-
-```typescript
-// Re-export public APIs
-export { DEFAULT_CONFIG, mergeConfig } from './config'
-export { createPatterns, PatternMatchers } from './patterns'
-export { processContent } from './engine'
-export type { SuperscriptConfig, TextPart } from './types'
-```
-
-**When to modify:** When exposing new public APIs or types.
-
-## Data Flow
+Both modes share 90% of the same code:
 
 ```mermaid
 graph TD
-    A[Nuxt App] --> B[plugin.ts]
-    B --> C[config.ts]
-    C --> D[patterns.ts]
-    B --> E[engine.ts]
-    E --> F[processor.ts]
-    F --> G[dom.ts]
-    F --> D
-    E --> H[errors.ts]
+    A[Input Text/HTML] --> B{DOM Environment}
+    B -->|Browser| C[Native DOM APIs]
+    B -->|Server| D[jsdom APIs]
     
-    I[Vue Component] --> J[useSmartScript.ts]
-    J --> B
+    C --> E[Pattern Detection<br/>patterns.ts - Regex]
+    D --> E
+    
+    E --> F[Text Processing<br/>processor.ts]
+    F --> G[DOM Manipulation<br/>engine.ts/dom.ts]
+    G --> H[Transformed Output<br/>HTML with ss-* classes]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style H fill:#9f9,stroke:#333,stroke-width:2px
+    style B fill:#ff9,stroke:#333,stroke-width:2px
 ```
 
-## Processing Pipeline
+## Key Components
 
-1. **Initialization**
-   - Plugin loads configuration
-   - Creates regex patterns
-   - Sets up MutationObserver
+### 1. Pattern Matching (`patterns.ts`)
 
-2. **Content Detection**
-   - TreeWalker traverses DOM
-   - Text nodes tested against patterns
-   - Matching nodes queued for processing
+Defines regex patterns for identifying text to transform:
 
-3. **Text Processing**
-   - Matched text analyzed by processor
-   - Broken into typed parts (text/super/sub)
-   - Parts validated and structured
+- **Symbols**: `(TM)` → ™, `(R)` → ®
+- **Ordinals**: `1st`, `2nd`, `3rd`, `4th`
+- **Chemicals**: `H2O`, `CO2`, `H2SO4`
+- **Math**: `x^2` (superscript), `x_1` (subscript)
 
-4. **DOM Manipulation**
-   - Document fragment created
-   - Elements built from parts
-   - Original text node replaced
+These patterns are **shared** between client and server.
 
-5. **Performance Optimization**
-   - Processing debounced (100ms)
-   - Batched updates (50 nodes)
-   - Hydration delay (1500ms)
+### 2. Text Processing (`processor.ts`)
 
-## Extension Points
+Core transformation logic that:
+- Takes raw text and pattern regex
+- Returns array of TextPart objects
+- Handles validation and edge cases
+- **Identical** for both client and server
 
-### Adding a New Pattern
+### 3. DOM Manipulation
 
-1. **Define Pattern** (`patterns.ts`):
-```typescript
-fractions: /\b(\d+)\/(\d+)\b/g
+#### Client-side (`engine.ts`)
+```javascript
+// Uses native browser APIs
+const walker = document.createTreeWalker(
+  element,
+  NodeFilter.SHOW_TEXT,
+  filterFunction
+)
 ```
 
-2. **Add Matcher** (`patterns.ts`):
-```typescript
-isFraction: (text: string): boolean => /^\d+\/\d+$/.test(text)
+#### Server-side (`nitro/plugin-jsdom.ts`)
+```javascript
+// Uses jsdom to provide DOM APIs
+const dom = new JSDOM(html)
+global.document = dom.window.document
+// Now can use same TreeWalker code
 ```
 
-3. **Process Match** (`processor.ts`):
+### 4. Element Creation (`dom.ts`)
+
+Creates the transformed elements:
+- `<span class="ss-tm">™</span>` - Positioned symbols
+- `<sup class="ss-ordinal">st</sup>` - Semantic superscripts
+- `<sub class="ss-chemical">2</sub>` - Semantic subscripts
+
+## Processing Flow
+
+### Development Mode (Client-only)
+
+```
+1. Page loads with raw content: "Product(TM)"
+2. Vue hydrates the page
+3. Plugin waits 1500ms (avoid hydration conflicts)
+4. TreeWalker finds text nodes
+5. Patterns match "(TM)"
+6. Processor creates TextPart array
+7. DOM replaced with: "Product<span class="ss-tm">™</span>"
+8. MutationObserver watches for new content
+```
+
+### Production Mode (SSR + Client)
+
+```
+1. Server receives request
+2. Nitro plugin hooks render:html
+3. jsdom parses HTML string
+4. Same processing pipeline runs
+5. HTML sent with transformations: "Product<span class="ss-tm">™</span>"
+6. Client receives pre-transformed HTML
+7. Client skips processing (detects meta tag)
+8. MutationObserver still watches for dynamic content
+```
+
+### Static Generation (SSG only)
+
+```
+1. nuxt generate runs
+2. Each route pre-rendered
+3. Nitro plugin transforms during generation
+4. Static HTML files contain transformations
+5. No client processing needed
+6. Optimal for SEO and performance
+```
+
+## Exclusion System
+
+Both modes respect the same exclusions:
+
+### Element-level Exclusions
+- `<pre>` - Code blocks
+- `<code>` - Inline code
+- `<script>` - JavaScript
+- `<style>` - CSS
+- `[data-no-superscript]` - Explicit opt-out
+- `.no-superscript` - Class-based opt-out
+
+### Context Checking
+```javascript
+// Client & Server both use this approach
+if (element.closest('[data-no-superscript]')) {
+  return // Skip processing
+}
+```
+
+## Performance Optimizations
+
+### Client-side
+- **Debouncing**: Batch mutations (100ms default)
+- **Batch Processing**: Process 50 nodes at a time
+- **Early Exit**: Skip if no patterns match
+- **Caching**: Pattern matching results cached
+
+### Server-side
+- **Single Pass**: Process during render
+- **No Watchers**: Static content doesn't need observation
+- **Selective Processing**: Only configured selectors
+
+## Configuration
+
+Unified configuration for both modes:
+
 ```typescript
-if (PatternMatchers.isFraction(matched)) {
-  const [num, denom] = matched.split('/')
-  return {
-    modified: true,
-    parts: [
-      { type: 'super', content: num },
-      { type: 'text', content: '⁄' },
-      { type: 'sub', content: denom }
-    ]
+export default defineNuxtConfig({
+  smartscript: {
+    // Enable/disable processing modes
+    ssr: true,        // Server-side processing
+    client: true,     // Client-side processing
+    
+    // Shared pattern configuration
+    transformations: {
+      trademark: true,
+      registered: true,
+      ordinals: true,
+      chemicals: true,
+      mathSuper: true,
+      mathSub: true
+    },
+    
+    // Shared selectors
+    selectors: {
+      include: ['main', 'article', 'section'],
+      exclude: ['pre', 'code', '[data-no-superscript]']
+    },
+    
+    // CSS positioning (applied by both modes)
+    cssVariables: {
+      'tm-top': '-0.4em',
+      'reg-top': '-0.4em'
+    }
   }
-}
+})
 ```
 
-4. **Style Elements** (`dom.ts`):
-```typescript
-if (part.content.includes('⁄')) {
-  element.className += ' fraction'
-}
-```
+## Why This Architecture?
 
-## Performance Considerations
+### Benefits of Unified Approach
 
-- **Debouncing:** All processing debounced at 100ms to prevent excessive updates
-- **Batching:** Nodes processed in batches of 50 for better performance
-- **Lazy Evaluation:** Patterns only compiled when needed
-- **Early Exit:** Quick text check before full regex processing
-- **TreeWalker:** Efficient DOM traversal with built-in filtering
+1. **DRY Principle**: Core logic written once, used everywhere
+2. **Consistency**: Same transformations regardless of rendering mode
+3. **Maintainability**: Fix bugs in one place
+4. **Testing**: Test core logic independently of environment
 
-## Error Recovery
+### Benefits of jsdom for SSR
 
-The module implements multiple layers of error recovery:
+1. **True DOM APIs**: Not regex HTML parsing
+2. **Reliable**: Handles complex nested HTML
+3. **Compatible**: Same code runs on client and server
+4. **Accurate**: Proper handling of exclusions and edge cases
 
-1. **Configuration Errors:** Falls back to defaults
-2. **Processing Errors:** Logs and continues with next node
-3. **DOM Errors:** Validates parent existence before replacement
-4. **Observer Errors:** Gracefully disables if creation fails
+### Trade-offs
 
-## Testing Strategy
+- **jsdom dependency**: Adds ~2MB to server bundle
+- **Performance**: Slightly slower than regex (worth it for accuracy)
+- **Complexity**: More setup code for SSR
 
-Each module has corresponding tests:
+## Future Enhancements
 
-- `patterns.test.ts` - Pattern matching validation
-- `processor.test.ts` - Text transformation logic
-- `config.test.ts` - Configuration merging/validation
-- `dom.test.ts` - DOM manipulation
-- `engine.test.ts` - Processing flow
+Potential improvements while maintaining architecture:
 
-## Security Considerations
+1. **Worker Thread Processing**: Offload to worker for large documents
+2. **Streaming SSR**: Process chunks as they render
+3. **Smart Caching**: Cache transformed fragments
+4. **Custom Elements**: Web Components for transformed content
 
-- No `innerHTML` usage - prevents XSS
-- Text content properly escaped
-- User input validated
-- Configuration sanitized
-- ARIA labels for accessibility
+## Summary
+
+The architecture achieves the goal of "write once, run anywhere" for typography transformations. By using jsdom on the server, we maintain true DOM parity between environments while sharing all business logic. This results in a robust, maintainable system that works consistently across all rendering modes.
