@@ -4,6 +4,8 @@
 
 export interface SuperscriptConfig {
   debug?: boolean // Enable debug logging
+  ssr?: boolean | 'force' // Enable server-side rendering
+  client?: boolean // Enable client-side processing
   symbols: {
     trademark: string[]
     registered: string[]

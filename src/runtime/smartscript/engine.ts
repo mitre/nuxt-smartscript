@@ -18,7 +18,7 @@ import { clearProcessingCaches, needsProcessing, processText } from './processor
  */
 export function processTextNode(
   textNode: Text,
-  config: SuperscriptConfig,
+  _config: SuperscriptConfig,
   pattern: RegExp,
 ): boolean {
   const text = textNode.textContent || ''
@@ -100,7 +100,7 @@ function createTextNodeFilter(
 export function processElement(
   element: Element,
   config: SuperscriptConfig,
-  patterns: PatternSet,
+  _patterns: PatternSet,
   combinedPattern: RegExp,
 ): void {
   // Skip if excluded
@@ -160,7 +160,10 @@ function batchProcessElements(
     const endIndex = Math.min(index + batchSize, elements.length)
 
     for (let i = index; i < endIndex; i++) {
-      processElement(elements[i], config, patterns, combinedPattern)
+      const element = elements[i]
+      if (element) {
+        processElement(element, config, patterns, combinedPattern)
+      }
     }
 
     index = endIndex

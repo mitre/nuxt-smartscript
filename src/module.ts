@@ -212,7 +212,7 @@ export default defineNuxtModule<ModuleOptions>({
     )
 
     if (shouldEnableSSR) {
-      addServerPlugin(resolver.resolve('./runtime/nitro/plugin-jsdom'))
+      addServerPlugin(resolver.resolve('./runtime/nitro/plugin'))
     }
 
     // Add CSS file

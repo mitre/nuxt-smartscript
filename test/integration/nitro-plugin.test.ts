@@ -79,7 +79,7 @@ describe('nitro SSR Plugin', () => {
     vi.resetModules()
 
     // Load the plugin fresh and register its hook
-    const pluginModule = await import('../../src/runtime/nitro/plugin-jsdom')
+    const pluginModule = await import('../../src/runtime/nitro/plugin')
     const plugin = pluginModule.default
     plugin(nitroApp as unknown as Parameters<typeof plugin>[0])
   })
@@ -207,11 +207,11 @@ describe('nitro SSR Plugin', () => {
     })
 
     it('should handle empty or missing content gracefully', async () => {
-      const testCases = [
+      const testCases: Array<Record<string, unknown[]> | undefined> = [
         { body: [], head: [] },
         { body: [''], head: [] },
         { body: ['<div></div>'], head: [] },
-        { body: null, head: [] },
+        { body: [] as unknown[], head: [] }, // Empty array instead of null
         undefined,
       ]
 

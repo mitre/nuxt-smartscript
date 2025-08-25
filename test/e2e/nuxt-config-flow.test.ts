@@ -15,10 +15,6 @@ await setup({
   browser: true,
   dev: false, // Build and serve for CI/CD compatibility
   setupTimeout: 120000, // 2 minute timeout for setup
-  nuxt: {
-    // Ensure the module is loaded
-    modules: ['../dist/module.mjs'],
-  },
 })
 
 describe('nuxt Module Config Flow', () => {

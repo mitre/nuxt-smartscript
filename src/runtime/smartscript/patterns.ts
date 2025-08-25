@@ -197,17 +197,17 @@ export const PatternMatchers = {
 export const PatternExtractors = {
   extractOrdinal: (text: string): { number: string, suffix: string } | null => {
     const match = text.match(ORDINAL_EXTRACT)
-    return match ? { number: match[1], suffix: match[2] } : null
+    return match && match[1] && match[2] ? { number: match[1], suffix: match[2] } : null
   },
 
   extractChemicalElement: (text: string): { element: string, count: string } | null => {
     const match = text.match(CHEMICAL_ELEMENT_EXTRACT)
-    return match ? { element: match[1], count: match[2] } : null
+    return match && match[1] && match[2] ? { element: match[1], count: match[2] } : null
   },
 
   extractChemicalParentheses: (text: string): string | null => {
     const match = text.match(CHEMICAL_PARENS_EXTRACT)
-    return match ? match[1] : null
+    return match && match[1] ? match[1] : null
   },
 
   extractMathScript: (text: string): string => {
@@ -217,7 +217,7 @@ export const PatternExtractors = {
   extractMathWithVariable: (text: string): { variable: string, script: string } | null => {
     // Unified pattern for both super (^) and subscript (_)
     const match = text.match(MATH_VARIABLE_EXTRACT)
-    if (match) {
+    if (match && match[1] && match[2]) {
       return {
         variable: match[1],
         script: stripBraces(match[2]),

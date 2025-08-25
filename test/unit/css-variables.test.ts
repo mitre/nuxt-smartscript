@@ -14,8 +14,8 @@ describe('cSS Variables Configuration', () => {
     dom = new JSDOM('<!DOCTYPE html><html><body></body></html>')
     document = dom.window.document
     window = dom.window as unknown as Window
-    global.document = document
-    global.window = window
+    global.document = document as unknown as Document
+    global.window = window as unknown as Window & typeof globalThis
   })
 
   it('should apply CSS variables to document root', () => {

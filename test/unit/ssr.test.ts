@@ -18,7 +18,9 @@ describe('sSR with jsdom', () => {
     // Make jsdom globals available
     global.document = document as unknown as Document
     global.window = window as unknown as Window & typeof globalThis
+    // @ts-expect-error - NodeFilter exists on jsdom window
     global.NodeFilter = window.NodeFilter as unknown as typeof NodeFilter
+    // @ts-expect-error - HTMLElement exists on jsdom window
     global.HTMLElement = window.HTMLElement as unknown as typeof HTMLElement
   })
 
@@ -32,7 +34,7 @@ describe('sSR with jsdom', () => {
 
   // Helper function to create test config
   const createTestConfig = (overrides?: Partial<SuperscriptConfig>): SuperscriptConfig => ({
-    symbols: { trademark: true, registered: true, copyright: true, ordinals: true },
+    symbols: { trademark: ['(TM)', '™'], registered: ['(R)', '®'], copyright: ['(C)', '©'], ordinals: true },
     selectors: { include: ['body', 'p', 'div', 'span'], exclude: ['pre', 'code', '[data-no-superscript]'] },
     performance: { debounce: 100, batchSize: 50, delay: 0 },
     positioning: {},

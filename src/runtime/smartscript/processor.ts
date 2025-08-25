@@ -6,10 +6,6 @@ import type { ProcessingResult, TextPart } from './types'
 import { logger } from './logger'
 import { PatternExtractors, PatternMatchers } from './patterns'
 
-// Cache for processed text to avoid redundant processing
-// WeakMap allows garbage collection when text nodes are removed
-const processedCache = new WeakMap<Text, TextPart[]>()
-
 // String-based cache for text processing results (LRU-style with size limit)
 const textResultCache = new Map<string, TextPart[]>()
 const MAX_CACHE_SIZE = 1000
@@ -29,7 +25,9 @@ function getCachedOrProcess(text: string, pattern: RegExp): TextPart[] {
   if (textResultCache.size >= MAX_CACHE_SIZE) {
     // Remove oldest entry (first in map)
     const firstKey = textResultCache.keys().next().value
-    textResultCache.delete(firstKey)
+    if (firstKey !== undefined) {
+      textResultCache.delete(firstKey)
+    }
   }
 
   textResultCache.set(text, result)
@@ -273,7 +271,6 @@ export function needsProcessing(text: string, pattern: RegExp): boolean {
  * Clear processing caches (useful for navigation or memory management)
  */
 export function clearProcessingCaches(): void {
-  processedCache.clear?.() // WeakMap doesn't have clear in all browsers
   textResultCache.clear()
   logger.debug('Processing caches cleared')
 }
