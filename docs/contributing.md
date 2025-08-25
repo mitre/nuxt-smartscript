@@ -52,15 +52,7 @@ if (PatternMatchers.isFraction(matched)) {
 }
 ```
 
-3. **Add test cases to `test/typography.test.ts`:**
-```typescript
-describe('Fractions', () => {
-  it('should match fraction patterns', () => {
-    const pattern = /\b(\d+)\/(\d+)\b/g
-    expect('1/2 cup'.match(pattern)).toEqual(['1/2'])
-  })
-})
-```
+3. **Add test cases** - See [Writing Tests Guide](./testing/writing-tests.md) for patterns and examples
 
 4. **Update playground example:**
 ```vue
@@ -91,51 +83,15 @@ fractions: {
 
 3. **Document in README.md**
 
-## ✅ Testing Guidelines
+## ✅ Testing
 
-### Running Tests
-```bash
-# Run all tests
-pnpm test
+We maintain **227+ tests** across unit, integration, E2E, and performance categories.
 
-# Run specific test file
-pnpm test test/typography.test.ts
-
-# Watch mode
-pnpm test:watch
-```
-
-### Writing Tests
-
-Tests should cover:
-1. **Pattern matching** - Does the regex work?
-2. **Text processing** - Is the output correct?
-3. **Edge cases** - Empty strings, special characters
-4. **Performance** - Large text blocks
-
-Example test structure:
-```typescript
-describe('Feature Name', () => {
-  // Test pattern matching
-  it('should match expected patterns', () => {
-    const pattern = /your-pattern/g
-    expect('test input'.match(pattern)).toEqual(['expected'])
-  })
-  
-  // Test processing
-  it('should transform correctly', () => {
-    const result = processMatch('input')
-    expect(result.parts).toEqual([
-      { type: 'super', content: 'expected' }
-    ])
-  })
-  
-  // Test edge cases
-  it('should handle edge cases', () => {
-    expect(processMatch('')).toEqual({ modified: false, parts: [] })
-  })
-})
-```
+**📚 See [Testing Documentation](./testing/index.md)** for:
+- Running tests
+- Writing new tests
+- Test patterns and examples
+- CI/CD integration
 
 ## 📋 Pull Request Process
 
@@ -144,8 +100,8 @@ describe('Feature Name', () => {
 1. **Fork & Clone** the repository
 2. **Create a feature branch:** `git checkout -b feature/your-feature`
 3. **Make your changes**
-4. **Add/update tests** - All new features need tests
-5. **Run tests:** `pnpm test` - Must pass
+4. **Add/update tests** - See [Writing Tests Guide](./testing/writing-tests.md)
+5. **Run tests:** `pnpm test` - All 227+ tests must pass
 6. **Run linter:** `pnpm lint` - Must pass
 7. **Test in playground:** `pnpm dev` - Verify visually
 8. **Update documentation** if needed
@@ -172,9 +128,9 @@ Brief description of changes
 - [ ] Performance improvement
 
 ## Testing
-- [ ] Tests pass locally
-- [ ] Added new tests
-- [ ] Tested in playground
+- [ ] All tests pass (`pnpm test`)
+- [ ] Added new tests (see [Writing Tests Guide](./testing/writing-tests.md))
+- [ ] Tested in playground (`pnpm dev`)
 
 ## Screenshots (if applicable)
 Before/after screenshots for visual changes

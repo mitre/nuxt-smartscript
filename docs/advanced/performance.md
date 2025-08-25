@@ -72,26 +72,21 @@ export default defineNuxtConfig({
 
 ## Targeted Processing
 
-### Limit Scope
+### Use Exclusion Zones
 
-Only process specific areas:
+Exclude areas that don't need processing:
 
-```typescript
-export default defineNuxtConfig({
-  smartscript: {
-    selectors: {
-      include: [
-        '.content',      // Only process content areas
-        'article',       // And article elements
-      ],
-      exclude: [
-        '.sidebar',      // Skip sidebars
-        '.navigation',   // Skip navigation
-        '.footer'        // Skip footers
-      ]
-    }
-  }
-})
+```html
+<!-- These areas won't be processed -->
+<div class="no-superscript">
+  <aside class="sidebar">...</aside>
+  <nav>...</nav>
+</div>
+
+<!-- Or use data attributes -->
+<div data-no-superscript>
+  Footer content with (TM) symbols unchanged
+</div>
 ```
 
 ### Disable Features
