@@ -5,6 +5,22 @@ All notable changes to nuxt-smartscript will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.4.1
+
+[compare changes](https://github.com/mitre/nuxt-smartscript/compare/v0.4.0...v0.4.1)
+
+### 🩹 Fixes
+
+- Add jsdom as runtime dependency ([6958297](https://github.com/mitre/nuxt-smartscript/commit/6958297))
+
+### 🏡 Chore
+
+- Update lockfile with jsdom in dependencies ([83a78b0](https://github.com/mitre/nuxt-smartscript/commit/83a78b0))
+
+### ❤️ Contributors
+
+- Aaron Lippold ([@aaronlippold](https://github.com/aaronlippold))
+
 ## v0.4.0
 
 [compare changes](https://github.com/mitre/nuxt-smartscript/compare/v0.3.1...v0.4.0)

@@ -1,7 +1,7 @@
 {
   "name": "@mitre/nuxt-smartscript",
   "type": "module",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Smart typography transformations for Nuxt - automatic superscript, subscript, and symbol formatting",
   "author": "SAF Team <saf@mitre.org>",
   "license": "Apache-2.0",
