@@ -17,10 +17,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Manually update npm to 11.5.1 or later which is the required version for trusted publishing to work # this step can be removed after the ubuntu runner has the correct minimum version of npm installed
+        run: npm install -g npm@latest
 
       - run: corepack enable
 
@@ -40,16 +43,14 @@ jobs:
       - name: Publish to npm
         run: |
           if [[ "${{ github.ref }}" == *"-beta"* ]]; then
-            npm publish --provenance --access public --tag beta
+            npm publish --access public --tag beta
           elif [[ "${{ github.ref }}" == *"-alpha"* ]]; then
-            npm publish --provenance --access public --tag alpha
+            npm publish --access public --tag alpha
           elif [[ "${{ github.ref }}" == *"-rc"* ]]; then
-            npm publish --provenance --access public --tag rc
+            npm publish --access public --tag rc
           else
-            npm publish --provenance --access public
+            npm publish --access public
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         env:
