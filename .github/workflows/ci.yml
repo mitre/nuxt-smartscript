@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
@@ -15,12 +18,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [20, 22]
+        node: [22]
 
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
 
@@ -44,7 +47,6 @@ jobs:
 
       - name: Lint
         run: pnpm lint
-        if: matrix.node == 22
 
       - name: Test types
         run: pnpm test:types
@@ -60,4 +62,3 @@ jobs:
 
       - name: Test performance
         run: npx vitest run test/performance
-        if: matrix.node == 22
